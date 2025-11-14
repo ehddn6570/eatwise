@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GhostTextManager">
+    <option name="inputs">
+      <map>
+        <entry key="Table User {&#10;  user_id bigint [pk, increment]&#10;  username varchar(100)&#10;  password varchar(255)&#10;  email varchar(255)&#10;  age int&#10;  gender varchar(10)&#10;  height double&#10;  weight double&#10;  created_at datetime&#10;}&#10;&#10;Table Food {&#10;  food_id bigint [pk, increment]&#10;  food_name varchar(255)&#10;  category varchar(100)&#10;  calories double&#10;  carbs double&#10;  protein double&#10;  fat double&#10;  image_url varchar(500)&#10;}&#10;&#10;Table MealRecord {&#10;  record_id bigint [pk, increment]&#10;  user_id bigint [ref: &gt; User.user_id]&#10;  food_id bigint [ref: &gt; Food.food_id]&#10;  intake_time datetime&#10;  intake_date date&#10;  quantity double&#10;  total_calories double&#10;}&#10;&#10;Table Goal {&#10;  goal_id bigint [pk, increment]&#10;  user_id bigint [ref: &gt; User.user_id]&#10;  daily_calorie_target double&#10;  carb_ratio double&#10;  protein_ratio double&#10;  fat_ratio double&#10;  start_date date&#10;  end_date date&#10;}&#10;&#10;Table Notification {&#10;  notification_id bigint [pk, increment]&#10;  user_id bigint [ref: &gt; User.user_id]&#10;  type varchar(50)&#10;  message text&#10;  created_at datetime&#10;  read_status boolean&#10;}&#10;&#10;Table Restaurant {&#10;  restaurant_id bigint [pk, increment]&#10;  name varchar(255)&#10;  address varchar(255)&#10;  phone varchar(50)&#10;  latitude double&#10;  longitude double&#10;  image_url varchar(500)&#10;}&#10;&#10;Table RecommendedFood {&#10;  rec_id bigint [pk, increment]&#10;  user_id bigint [ref: &gt; User.user_id]&#10;  food_id bigint [ref: &gt; Food.food_id]&#10;  reason text&#10;  created_at datetime&#10;}&#10;&#10;Table Report {&#10;  report_id bigint [pk, increment]&#10;  user_id bigint [ref: &gt; User.user_id]&#10;  report_date date&#10;  calories_consumed double&#10;  nutrient_summary text&#10;  feedback text&#10;}&#10;&#10;Table Auth {&#10;  auth_id bigint [pk, increment]&#10;  user_id bigint [ref: &gt; User.user_id]&#10;  email varchar(255)&#10;  verification_code varchar(100)&#10;  expires_at datetime&#10;  verified boolean&#10;}&#10;&#10;이렇게 er다이어그램이 그려질때 domain 폴더안에 있는 폴더에 맞게 각각 작성해줄수 있어?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763150674758" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="eatwise 프로젝트에 관해 코드짠거 보여?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763150459697" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="이렇게 완성해야하는데 더 작성해야하는 코드들 작성해줘 일단 백엔드 부분만">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763151241686" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
