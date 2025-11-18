@@ -39,6 +39,18 @@
             </GhostTextMetaData>
           </value>
         </entry>
+        <entry key="그냥 usercontroller에서 /api/users를 삭제하고 바로 /login으로 연결되게 하는건 어때?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763156017781" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
         <entry key="난 왜 실행하면 오류가 뜨지?">
           <value>
             <GhostTextMetaData>
@@ -63,6 +75,78 @@
             </GhostTextMetaData>
           </value>
         </entry>
+        <entry key="아니 그러니깐 localhost:8080으로 접속하면 한 화면에 로그인 버튼과 회원가입 버튼이 있어서 회원가입 버튼을 누르면 회원가입 페이지로 넘어가게 작성해달라고">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763155697975" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="아니 똑같다고 그냥 localhost:8080/login 이 url에 뜨는 화면을 내가 말한대로 수정해달라고">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763156500600" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="아니 지금도 똑같은데?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763156604809" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="아니 지금은 spring sequrity때문에 너가 만든 html이 아니라 spring sequrity 자체의 프론트엔드 화면이 뜬다니깐">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763156547139" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="아니 지금은 자동으로 localhost:8080/login으로 연결된다니깐?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763156253606" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="아니야 지금도 login으로 리다이렉트돼 차라리 login화면에서 내가 말한대로 수정하는게 낫지않을까?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763156399821" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
         <entry key="이렇게 완성해야하는데 더 작성해야하는 코드들 작성해줘 일단 백엔드 부분만">
           <value>
             <GhostTextMetaData>
@@ -75,6 +159,30 @@
             </GhostTextMetaData>
           </value>
         </entry>
+        <entry key="지금 localhost:8080으로 들어가면 http://localhost:8080/login여기로 연결되는데 맞아?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763156108361" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="지금 login백엔드코드는어딨어?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763155828815" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
         <entry key="지금 뜨는 에러는 뭐야?">
           <value>
             <GhostTextMetaData>
@@ -82,6 +190,54 @@
               <option name="timestamps">
                 <list>
                   <option value="1763152088663" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="지금 프로젝트를 웹으로 돌리면 첫화면은 뭐야?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763155343042" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="지금은 localhost:8080으로 접속하면 /login으로 접속되는거아니야?">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763155619067" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="첫화면에 로그인화면과 그 옆에는 회원가입을 누를수있게 작성해줘">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763155432595" />
+                </list>
+              </option>
+            </GhostTextMetaData>
+          </value>
+        </entry>
+        <entry key="한국어로좀대답해">
+          <value>
+            <GhostTextMetaData>
+              <option name="count" value="1.0" />
+              <option name="timestamps">
+                <list>
+                  <option value="1763155370233" />
                 </list>
               </option>
             </GhostTextMetaData>

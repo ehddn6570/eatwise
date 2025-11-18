@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatWise - 대시보드</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">EatWise</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-item active">대시보드</a>
+                <a href="#" class="nav-item">식단 기록</a>
+                <a href="#" class="nav-item">목표 관리</a>
+                <a href="#" class="nav-item">레포트</a>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h2>안녕하세요, <span id="username">사용자</span>님!</h2>
+            <p>건강한 식습관을 위한 여정을 시작해보세요</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- 오늘의 칼로리 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>오늘의 칼로리</h3>
+                </div>
+                <div class="card-body">
+                    <div class="calorie-info">
+                        <div class="calorie-circle">
+                            <span class="calorie-number">0</span>
+                            <span class="calorie-unit">kcal</span>
+                        </div>
+                        <div class="calorie-detail">
+                            <p>목표: <strong>2000 kcal</strong></p>
+                            <p>남은 칼로리: <strong>2000 kcal</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 영양소 섭취 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>영양소 섭취</h3>
+                </div>
+                <div class="card-body">
+                    <div class="nutrient-item">
+                        <span>탄수화물</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span>0g / 300g</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span>단백질</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span>0g / 100g</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span>지방</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span>0g / 65g</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 최근 식사 기록 -->
+            <div class="card wide">
+                <div class="card-header">
+                    <h3>최근 식사 기록</h3>
+                    <button class="btn-add" onclick="addMeal()">+ 식사 추가</button>
+                </div>
+                <div class="card-body">
+                    <div class="empty-state">
+                        <p>아직 기록된 식사가 없습니다.</p>
+                        <p>첫 식사를 기록해보세요!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 목표 달성률 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>이번 주 목표</h3>
+                </div>
+                <div class="card-body">
+                    <div class="goal-item">
+                        <span>식사 기록</span>
+                        <span class="goal-progress">0 / 21</span>
+                    </div>
+                    <div class="goal-item">
+                        <span>칼로리 목표 달성</span>
+                        <span class="goal-progress">0 / 7</span>
+                    </div>
+                    <div class="goal-item">
+                        <span>균형잡힌 영양소</span>
+                        <span class="goal-progress">0 / 7</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 추천 식단 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>오늘의 추천 식단</h3>
+                </div>
+                <div class="card-body">
+                    <div class="recommendation">
+                        <p>아침: 귀리 오트밀 + 과일</p>
+                        <p>점심: 현미밥 + 닭가슴살 샐러드</p>
+                        <p>저녁: 연어 구이 + 채소</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 로그아웃 기능
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+
+        // 식사 추가 기능
+        function addMeal() {
+            alert('식사 추가 기능은 준비 중입니다.');
+        }
+
+        // 사용자 정보 로드
+        window.onload = function() {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    document.getElementById('username').textContent = user.username || '사용자';
+                } catch (e) {
+                    console.error('사용자 정보 파싱 실패:', e);
+                }
+            }
+        };
+    </script>
+</body>
+</html>

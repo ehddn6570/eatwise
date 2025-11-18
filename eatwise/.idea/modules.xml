@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.project.eatwise.main.iml" filepath="$PROJECT_DIR$/.idea/modules/com.project.eatwise.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/eatwise.iml" filepath="$PROJECT_DIR$/.idea/eatwise.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/eatwise.main.iml" filepath="$PROJECT_DIR$/.idea/modules/eatwise.main.iml" />
     </modules>
   </component>
 </project>
