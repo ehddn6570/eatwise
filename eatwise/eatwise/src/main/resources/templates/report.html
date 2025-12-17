@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatWise - 레포트</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .report-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .report-container.monthly-mode {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .report-card:nth-child(2) {
+            justify-content: space-between;
+        }
+
+        .report-title {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #2E7D32;
+            margin-bottom: 13px;
+            border-bottom: 2px solid #d4f2c2;
+            padding-bottom: 7px;
+        }
+
+        .meal-records-list {
+            height: 750px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .meal-record-item {
+            padding: 12px;
+            border-left: 4px solid #2E7D32;
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .meal-record-item:hover {
+            background: #f0f8f0;
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.15);
+        }
+
+        .meal-date {
+            font-weight: 600;
+            color: #2E7D32;
+            font-size: 0.92em;
+        }
+
+        .meal-type {
+            display: inline-block;
+            background: #2E7D32;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin: 5px 0;
+        }
+
+        .meal-food {
+            color: #555;
+            font-size: 0.87em;
+            margin: 5px 0;
+        }
+
+        .meal-calories {
+            color: #d4af37;
+            font-weight: 600;
+            font-size: 0.87em;
+        }
+
+        .analysis-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 13px;
+            margin-bottom: 14px;
+        }
+
+        .analysis-box {
+            background: linear-gradient(135deg, #f7fbf1 0%, #d4f2c2 100%);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #2E7D32;
+        }
+
+        .analysis-label {
+            font-size: 0.82em;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .analysis-value {
+            font-size: 1.45em;
+            font-weight: 700;
+            color: #2E7D32;
+        }
+
+        .analysis-unit {
+            font-size: 0.78em;
+            color: #777;
+        }
+
+        .nutrient-analysis {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .nutrient-box {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .nutrient-name {
+            font-size: 0.77em;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .nutrient-value {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #2E7D32;
+        }
+
+        .nutrient-goal {
+            font-size: 0.7em;
+            color: #999;
+        }
+
+        .weekly-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
+            gap: 3px;
+            margin-top: 12px;
+        }
+
+        .weekly-chart.monthly-mode {
+            grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+            gap: 1px;
+        }
+
+        .chart-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 110px;
+        }
+
+        .bar-fill {
+            width: 23px;
+            background: linear-gradient(180deg, #2E7D32 0%, #4caf50 100%);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            min-height: 14px;
+        }
+
+        .bar-fill:hover {
+            opacity: 0.8;
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+        }
+
+        .bar-label {
+            font-size: 0.6em;
+            color: #555;
+            margin-top: 3px;
+            text-align: center;
+        }
+
+        .bar-value {
+            font-size: 0.6em;
+            color: #2E7D32;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .week-range {
+            text-align: center;
+            color: #666;
+            font-size: 0.8em;
+            margin-bottom: 7px;
+        }
+
+        .habit-advice-section {
+            margin-top: 18px;
+            padding: 14px;
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-radius: 12px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .habit-advice-title {
+            font-size: 0.97em;
+            font-weight: 600;
+            color: #ff6b35;
+            margin-bottom: 11px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .advice-item {
+            background: white;
+            padding: 9px;
+            border-radius: 8px;
+            margin-bottom: 7px;
+            border-left: 3px solid #ffc107;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .advice-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .advice-emoji {
+            display: inline-block;
+            font-size: 0.95em;
+            margin-right: 5px;
+        }
+
+        .advice-text {
+            color: #333;
+            font-size: 0.8em;
+            line-height: 1.35;
+        }
+
+        .advice-priority {
+            display: inline-block;
+            font-size: 0.62em;
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-left: 5px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .priority-medium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .priority-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .period-btn {
+            padding: 10px 20px;
+            border: 2px solid #2E7D32;
+            background: white;
+            color: #2E7D32;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .period-btn:hover {
+            background: #f0f8f0;
+        }
+
+        .period-btn.active {
+            background: #2E7D32;
+            color: white;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+        }
+
+        @media (max-width: 1200px) {
+            .report-container {
+                grid-template-columns: 1fr;
+            }
+
+            .nutrient-analysis {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">EatWise</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-item">대시보드</a>
+                <a href="/restaurant-map" class="nav-item">음식점 지도</a>
+                <a href="/report" class="nav-item active">레포트</a>
+                <a href="/edit-profile" class="nav-item">정보 수정</a>
+                <button class="btn-notification" onclick="openNotifications()">
+                    🔔 알림
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h2 id="pageTitle">주간 식사 분석 레포트</h2>
+            <p>최근 7일간의 식사 기록과 영양소 분석</p>
+        </div>
+
+        <div class="period-selector">
+            <button class="period-btn active" onclick="changePeriod('week')">이번 주</button>
+            <button class="period-btn" onclick="changePeriod('month')">이번 달</button>
+        </div>
+
+        <div class="report-container">
+            <!-- 왼쪽: 식사 기록 -->
+            <div class="report-card">
+                <div class="report-title" id="mealRecordsTitle">📋 최근 식사 기록</div>
+                <div id="mealRecordsList" class="meal-records-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <p>식사 기록이 없습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 분석 -->
+            <div class="report-card">
+                <div class="report-title" id="analysisTitle">📊 주간 분석</div>
+
+                <!-- 총 칼로리 분석 -->
+                <div class="analysis-section">
+                    <div class="analysis-box">
+                        <div class="analysis-label">총 섭취 칼로리</div>
+                        <div class="analysis-value">
+                            <span id="totalCalories">0</span>
+                            <span class="analysis-unit">kcal</span>
+                        </div>
+                    </div>
+                    <div class="analysis-box">
+                        <div class="analysis-label">평균 일일 칼로리</div>
+                        <div class="analysis-value">
+                            <span id="avgCalories">0</span>
+                            <span class="analysis-unit">kcal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 영양소 분석 -->
+                <div class="nutrient-analysis">
+                    <div class="nutrient-box">
+                        <div class="nutrient-name">탄수화물</div>
+                        <div style="display: flex; justify-content: center; align-items: baseline; gap: 3px;">
+                            <div class="nutrient-value" id="totalCarbs">0</div>
+                            <div class="nutrient-goal">g (총)</div>
+                        </div>
+                        <div style="font-size: 0.85em; color: #2E7D32; margin-top: 5px; font-weight: 600;">
+                            <span id="avgCarbs">0</span>g/일
+                        </div>
+                    </div>
+                    <div class="nutrient-box">
+                        <div class="nutrient-name">단백질</div>
+                        <div style="display: flex; justify-content: center; align-items: baseline; gap: 3px;">
+                            <div class="nutrient-value" id="totalProtein">0</div>
+                            <div class="nutrient-goal">g (총)</div>
+                        </div>
+                        <div style="font-size: 0.85em; color: #2E7D32; margin-top: 5px; font-weight: 600;">
+                            <span id="avgProtein">0</span>g/일
+                        </div>
+                    </div>
+                    <div class="nutrient-box">
+                        <div class="nutrient-name">지방</div>
+                        <div style="display: flex; justify-content: center; align-items: baseline; gap: 3px;">
+                            <div class="nutrient-value" id="totalFat">0</div>
+                            <div class="nutrient-goal">g (총)</div>
+                        </div>
+                        <div style="font-size: 0.85em; color: #2E7D32; margin-top: 5px; font-weight: 600;">
+                            <span id="avgFat">0</span>g/일
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 주간 칼로리 차트 -->
+                <div style="margin-top: 30px;">
+                    <div class="report-title" id="chartTitle" style="border: none; margin: 0 0 10px 0;">📈 주간 칼로리 추이</div>
+                    <div class="week-range" id="weekRange"></div>
+                    <div class="weekly-chart" id="weeklyChart"></div>
+                </div>
+
+                <!-- 식습관 개선 조언 섹션 -->
+                <div class="habit-advice-section" id="habitAdviceSection" style="display: none;">
+                    <div class="habit-advice-title">
+                        <span>🍽️ 식습관 개선 조언</span>
+                    </div>
+                    <div id="adviceList">
+                        <!-- 조언 항목이 동적으로 추가됩니다. -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userId = null;
+        let currentPeriod = 'week';
+
+        // 음식 카테고리를 한글로 변환
+        function getCategoryInKorean(category) {
+            const categoryMap = {
+                'korean': '한식',
+                'western': '양식',
+                'japanese': '일식',
+                'chinese': '중식',
+                'beverage': '음료',
+                '한식': '한식',
+                '양식': '양식',
+                '일식': '일식',
+                '중식': '중식',
+                '음료': '음료'
+            };
+            return categoryMap[category] || category || '기타';
+        }
+
+        // 식사 유형을 한글로 변환
+        function getMealTypeInKorean(mealType) {
+            const mealTypeMap = {
+                'breakfast': '아침',
+                'lunch': '점심',
+                'dinner': '저녁',
+                'snack': '간식'
+            };
+            return mealTypeMap[mealType] || mealType || '식사';
+        }
+
+        // 페이지 로드시 초기화
+        window.addEventListener('load', function() {
+            const userStr = localStorage.getItem('user');
+
+            if (!userStr) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const user = JSON.parse(userStr);
+                userId = user.userId || user.id;
+
+                if (!userId) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                loadReportData();
+            } catch (e) {
+                console.error('사용자 정보 파싱 실패:', e);
+                window.location.href = '/login';
+            }
+        });
+
+        // 기간 변경
+        function changePeriod(period) {
+            console.log('🔄 기간 변경:', period); // 디버깅 로그
+            currentPeriod = period;
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 페이지 제목 및 설명 업데이트
+            const pageTitle = document.getElementById('pageTitle');
+            const pageParagraph = document.querySelector('.welcome-section p');
+            const mealRecordsTitle = document.getElementById('mealRecordsTitle');
+            const reportContainer = document.querySelector('.report-container');
+
+            if (period === 'week') {
+                pageTitle.textContent = '주간 식사 분석 레포트';
+                pageParagraph.textContent = '최근 7일간의 식사 기록과 영양소 분석';
+                mealRecordsTitle.textContent = '📋 최근 식사 기록';
+                reportContainer.classList.remove('monthly-mode');
+            } else if (period === 'month') {
+                pageTitle.textContent = '월간 식사 분석 레포트';
+                pageParagraph.textContent = '현재 달의 모든 식사 기록과 영양소 분석';
+                mealRecordsTitle.textContent = '📋 월간 식사 기록';
+                reportContainer.classList.add('monthly-mode');
+            }
+
+            // 분석 제목 업데이트
+            const titleElement = document.getElementById('analysisTitle');
+            if (period === 'week') {
+                titleElement.textContent = '📊 주간 분석';
+            } else if (period === 'month') {
+                titleElement.textContent = '📊 월간 분석';
+            }
+
+            loadReportData();
+        }
+
+        // 레포트 데이터 로드
+        async function loadReportData() {
+            try {
+                const token = localStorage.getItem('token');
+
+                // 기간 계산
+                const today = new Date();
+                let queryStartDate = new Date();
+                let queryEndDate = new Date(today);
+
+                if (currentPeriod === 'week') {
+                    queryStartDate.setDate(queryEndDate.getDate() - 7);
+                } else {
+                    // 월간: 현재 달의 1일부터 오늘까지
+                    queryStartDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    // queryEndDate는 이미 오늘 날짜
+                }
+
+                const startDateStr = queryStartDate.toISOString().split('T')[0];
+                const endDateStr = queryEndDate.toISOString().split('T')[0];
+
+                console.log('📅 조회 기간:', startDateStr, '~', endDateStr, '| 모드:', currentPeriod);
+
+                // API 호출
+                const response = await fetch(`/api/meal-records/period?userId=${userId}&startDate=${startDateStr}&endDate=${endDateStr}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const mealRecords = await response.json();
+
+                // 데이터 분석 및 표시
+                analyzeMealRecords(mealRecords, queryStartDate, queryEndDate);
+                displayMealRecords(mealRecords);
+                displayWeeklyChart(mealRecords, queryStartDate, queryEndDate);
+
+
+            } catch (error) {
+                console.error('레포트 데이터 로드 실패:', error);
+            }
+        }
+
+        // 식사 기록 분석
+        function analyzeMealRecords(mealRecords, startDate, endDate) {
+            let totalCalories = 0;
+            let totalCarbs = 0;
+            let totalProtein = 0;
+            let totalFat = 0;
+
+            mealRecords.forEach(record => {
+                totalCalories += record.totalCalories || 0;
+                if (record.food) {
+                    // quantity는 그램 단위이고, 영양소는 100g 기준이므로 / 100 필요
+                    const quantityRatio = (record.quantity || 0) / 100;
+                    totalCarbs += (record.food.carbs || 0) * quantityRatio;
+                    totalProtein += (record.food.protein || 0) * quantityRatio;
+                    totalFat += (record.food.fat || 0) * quantityRatio;
+                }
+            });
+
+            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            const avgCalories = days > 0 ? Math.round(totalCalories / days) : 0;
+            const avgCarbs = days > 0 ? (totalCarbs / days).toFixed(1) : 0;
+            const avgProtein = days > 0 ? (totalProtein / days).toFixed(1) : 0;
+            const avgFat = days > 0 ? (totalFat / days).toFixed(1) : 0;
+
+            document.getElementById('totalCalories').textContent = Math.round(totalCalories);
+            document.getElementById('avgCalories').textContent = avgCalories;
+            document.getElementById('totalCarbs').textContent = Math.round(totalCarbs);
+            document.getElementById('avgCarbs').textContent = avgCarbs;
+            document.getElementById('totalProtein').textContent = Math.round(totalProtein);
+            document.getElementById('avgProtein').textContent = avgProtein;
+            document.getElementById('totalFat').textContent = Math.round(totalFat);
+            document.getElementById('avgFat').textContent = avgFat;
+        }
+
+        // 식사 기록 표시
+        function displayMealRecords(mealRecords) {
+            const container = document.getElementById('mealRecordsList');
+
+            if (mealRecords.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <p>이 기간의 식사 기록이 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 식사 기록을 시간 역순으로 정렬 (최신순)
+            const sortedRecords = [...mealRecords].sort((a, b) => {
+                const dateTimeA = new Date(`${a.intakeDate}T${a.intakeTime || '00:00:00'}`);
+                const dateTimeB = new Date(`${b.intakeDate}T${b.intakeTime || '00:00:00'}`);
+                return dateTimeB - dateTimeA; // 역순 (최신이 위)
+            });
+
+            let html = '';
+            sortedRecords.forEach(record => {
+                const date = new Date(record.intakeDate).toLocaleDateString('ko-KR');
+                const mealTypeEmoji = getMealTypeEmoji(record.mealType);
+                const mealTypeKorean = getMealTypeInKorean(record.mealType);
+                const foodName = record.food?.foodName || '음식 정보 없음';
+                html += `
+                    <div class="meal-record-item">
+                        <div style="color: #666; font-size: 0.9em; margin-bottom: 5px;">${date}</div>
+                        <div class="meal-date">${mealTypeEmoji} ${mealTypeKorean}</div>
+                        <div class="meal-food">🍖 ${foodName}</div>
+                        <div class="meal-calories">칼로리: ${record.totalCalories || 0} kcal</div>
+                    </div>
+                `;
+            });
+
+
+            container.innerHTML = html;
+        }
+
+        // 로컬 날짜를 YYYY-MM-DD 형식으로 변환
+        function formatLocalDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 주간/월간 칼로리 차트 표시
+        function displayWeeklyChart(mealRecords, startDate, endDate) {
+            // 날짜별 칼로리 합계 계산
+            const dailyCalories = {};
+            const days = [];
+
+            // 기간 내 모든 날짜 생성
+            const currentDate = new Date(startDate);
+            const endDateStr = formatLocalDate(endDate);
+
+            while (formatLocalDate(currentDate) <= endDateStr) {
+                const dateStr = formatLocalDate(currentDate);
+                dailyCalories[dateStr] = 0;
+                days.push(dateStr);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            mealRecords.forEach(record => {
+                const dateStr = record.intakeDate;
+                if (dailyCalories.hasOwnProperty(dateStr)) {
+                    dailyCalories[dateStr] += record.totalCalories || 0;
+                }
+            });
+
+            const maxCalories = Math.max(...Object.values(dailyCalories), 2000);
+            let chartHtml = '';
+
+            // 월간 모드인 경우 차트 바의 높이를 조정
+            const isMonthly = currentPeriod === 'month';
+            const barHeight = 150;  // 주간, 월간 모두 동일한 높이
+            const barWidth = isMonthly ? 20 : 30;
+
+            days.forEach(dateStr => {
+                const date = new Date(dateStr);
+                const dayName = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+                const calories = dailyCalories[dateStr];
+                const height = (calories / maxCalories) * barHeight;
+
+                chartHtml += `
+                    <div class="chart-bar" style="height: ${barHeight}px;">
+                        <div class="bar-fill" style="height: ${height}px; width: ${barWidth}px;" title="${calories} kcal"></div>
+                        <div class="bar-label" style="font-size: ${isMonthly ? '0.65em' : '0.75em'};">${date.getDate()}일</div>
+                        <div class="bar-value" style="font-size: ${isMonthly ? '0.65em' : '0.75em'};">${Math.round(calories)}<br>kcal</div>
+                    </div>
+                `;
+            });
+
+            const chartContainer = document.getElementById('weeklyChart');
+            chartContainer.innerHTML = chartHtml;
+
+            // 월간 모드일 때 클래스 추가
+            if (isMonthly) {
+                chartContainer.classList.add('monthly-mode');
+            } else {
+                chartContainer.classList.remove('monthly-mode');
+            }
+
+            // 주간 범위 표시 및 차트 제목 업데이트
+            const startStr = startDate.toLocaleDateString('ko-KR');
+            const endStr = endDate.toLocaleDateString('ko-KR');
+            document.getElementById('weekRange').textContent = `${startStr} ~ ${endStr}`;
+
+            // 차트 제목 업데이트
+            const chartTitleElement = document.getElementById('chartTitle');
+            console.log('📊 currentPeriod:', currentPeriod); // 디버깅 로그
+            if (currentPeriod === 'week') {
+                chartTitleElement.textContent = '📈 주간 칼로리 추이';
+            } else if (currentPeriod === 'month') {
+                chartTitleElement.textContent = '📈 월간 칼로리 추이';
+            }
+        }
+
+        // 식사 유형 이모지
+        function getMealTypeEmoji(mealType) {
+            const emojiMap = {
+                'breakfast': '🌅',
+                'lunch': '☀️',
+                'dinner': '🌙',
+                'snack': '🍪'
+            };
+            return emojiMap[mealType] || '🍽️';
+        }
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            window.location.href = '/login';
+        }
+
+        // 알림 열기 (기본 구현)
+        function openNotifications() {
+            alert('알림 기능은 곧 제공될 예정입니다.');
+        }
+
+        // 식습관 개선 조언 로드 - 사용자 정보 기반으로 권장값 계산하여 조언 생성
+        async function loadHabitAdvice() {
+            try {
+                // 로컬스토리지에서 사용자 정보 가져오기
+                const userStr = localStorage.getItem('user');
+                if (!userStr) {
+                    console.log('사용자 정보를 찾을 수 없습니다.');
+                    return;
+                }
+
+                const user = JSON.parse(userStr);
+                const height = user.height || 170; // cm
+                const weight = user.weight || 65; // kg
+                const gender = user.gender; // 'M' 또는 'F'
+                const age = user.age || 25;
+
+                // BMR (기초대사량) 계산 - Harris-Benedict 공식
+                let bmr = 0;
+                if (gender === 'M' || gender === 'MALE' || gender === 'm' || gender === 'male') {
+                    // 남성: BMR = 88.362 + (13.397 × weight) + (4.799 × height) - (5.677 × age)
+                    bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+                } else {
+                    // 여성: BMR = 447.593 + (9.247 × weight) + (3.098 × height) - (4.330 × age)
+                    bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+                }
+
+                // 활동계수 적용 (보통 활동량: 1.55)
+                const recommendedCalories = Math.round(bmr * 1.55);
+
+                // 권장 영양소 계산
+                // 탄수화물: 전체 칼로리의 50-60%
+                // 단백질: 체중 1kg당 1.2-1.6g (운동량에 따라)
+                // 지방: 전체 칼로리의 20-30%
+                const recommendedCarbs = Math.round((recommendedCalories * 0.55) / 4); // 1g = 4kcal
+                const recommendedProtein = Math.round(weight * 1.4); // 1kg당 1.4g
+                const recommendedFat = Math.round((recommendedCalories * 0.25) / 9); // 1g = 9kcal
+
+                console.log(`📊 사용자 정보: 키=${height}cm, 체중=${weight}kg, 성별=${gender}, 나이=${age}`);
+                console.log(`💪 권장값: 칼로리=${recommendedCalories}kcal, 탄=${recommendedCarbs}g, 단=${recommendedProtein}g, 지=${recommendedFat}g`);
+
+                // 현재 섭취량 가져오기
+                const avgCarbsEl = document.getElementById('avgCarbs');
+                const avgProteinEl = document.getElementById('avgProtein');
+                const avgFatEl = document.getElementById('avgFat');
+
+                const actualCarbs = parseFloat(avgCarbsEl.textContent) || 0;
+                const actualProtein = parseFloat(avgProteinEl.textContent) || 0;
+                const actualFat = parseFloat(avgFatEl.textContent) || 0;
+
+                console.log(`📈 실제 섭취: 탄=${actualCarbs}g, 단=${actualProtein}g, 지=${actualFat}g`);
+
+                // 조언 생성
+                generateHabitAdvice(actualCarbs, actualProtein, actualFat, recommendedCarbs, recommendedProtein, recommendedFat);
+
+            } catch (error) {
+                console.error('식습관 개선 조언 로드 실패:', error);
+            }
+        }
+
+        // 권장값과 실제 섭취량을 비교하여 조언 생성
+        function generateHabitAdvice(actualCarbs, actualProtein, actualFat, recCarbs, recProtein, recFat) {
+            const adviceList = document.getElementById('adviceList');
+            adviceList.innerHTML = '';
+
+            const advices = [];
+
+            // 탄수화물 조언 (기준: ±10%)
+            const carbDiff = actualCarbs - recCarbs;
+            const carbRatio = Math.abs(carbDiff) / recCarbs * 100;
+
+            if (carbRatio > 20) {
+                // 20% 이상 벗어남 = 긴급
+                advices.push({
+                    emoji: '🍚',
+                    text: `탄수화물 섭취가 ${carbDiff > 0 ? '과다합니다' : '부족합니다'}. 현재: ${Math.round(actualCarbs)}g → 권장: ${recCarbs}g (${Math.round(carbRatio)}% ${carbDiff > 0 ? '초과' : '부족'})`,
+                    priority: 'high'
+                });
+            } else if (carbRatio > 10) {
+                // 10~20% 범위 = 보통
+                advices.push({
+                    emoji: '🍚',
+                    text: `탄수화물 섭취가 ${carbDiff > 0 ? '약간 높습니다' : '약간 낮습니다'}. 현재: ${Math.round(actualCarbs)}g → 권장: ${recCarbs}g (${Math.round(carbRatio)}% ${carbDiff > 0 ? '초과' : '부족'})`,
+                    priority: 'medium'
+                });
+            } else {
+                // 10% 이내 = 적절
+                advices.push({
+                    emoji: '✅',
+                    text: `탄수화물 섭취가 적절합니다. 현재: ${Math.round(actualCarbs)}g / 권장: ${recCarbs}g`,
+                    priority: 'low'
+                });
+            }
+
+            // 단백질 조언 (기준: ±15%)
+            const proteinDiff = actualProtein - recProtein;
+            const proteinRatio = Math.abs(proteinDiff) / recProtein * 100;
+
+            if (proteinRatio > 20) {
+                // 20% 이상 벗어남 = 긴급
+                advices.push({
+                    emoji: '🥩',
+                    text: `단백질 섭취가 ${proteinDiff > 0 ? '과다합니다' : '부족합니다'}. 현재: ${Math.round(actualProtein)}g → 권장: ${recProtein}g (${Math.round(proteinRatio)}% ${proteinDiff > 0 ? '초과' : '부족'})`,
+                    priority: 'high'
+                });
+            } else if (proteinRatio > 15) {
+                // 15~20% 범위 = 보통
+                advices.push({
+                    emoji: '🥩',
+                    text: `단백질 섭취가 ${proteinDiff > 0 ? '약간 높습니다' : '약간 낮습니다'}. 현재: ${Math.round(actualProtein)}g → 권장: ${recProtein}g (${Math.round(proteinRatio)}% ${proteinDiff > 0 ? '초과' : '부족'})`,
+                    priority: 'medium'
+                });
+            } else {
+                // 15% 이내 = 적절
+                advices.push({
+                    emoji: '✨',
+                    text: `단백질 섭취가 적절합니다. 현재: ${Math.round(actualProtein)}g / 권장: ${recProtein}g`,
+                    priority: 'low'
+                });
+            }
+
+            // 지방 조언 (기준: ±15%)
+            const fatDiff = actualFat - recFat;
+            const fatRatio = Math.abs(fatDiff) / recFat * 100;
+
+            if (fatRatio > 20) {
+                // 20% 이상 벗어남 = 긴급
+                advices.push({
+                    emoji: '🍔',
+                    text: `지방 섭취가 ${fatDiff > 0 ? '과다합니다' : '부족합니다'}. 현재: ${Math.round(actualFat)}g → 권장: ${recFat}g (${Math.round(fatRatio)}% ${fatDiff > 0 ? '초과' : '부족'})`,
+                    priority: 'high'
+                });
+            } else if (fatRatio > 15) {
+                // 15~20% 범위 = 보통
+                advices.push({
+                    emoji: '🍔',
+                    text: `지방 섭취가 ${fatDiff > 0 ? '약간 높습니다' : '약간 낮습니다'}. 현재: ${Math.round(actualFat)}g → 권장: ${recFat}g (${Math.round(fatRatio)}% ${fatDiff > 0 ? '초과' : '부족'})`,
+                    priority: 'medium'
+                });
+            } else {
+                // 15% 이내 = 적절
+                advices.push({
+                    emoji: '⚖️',
+                    text: `지방 섭취가 적절합니다. 현재: ${Math.round(actualFat)}g / 권장: ${recFat}g`,
+                    priority: 'low'
+                });
+            }
+
+            // HTML 생성 및 표시
+            advices.forEach(advice => {
+                const adviceItem = document.createElement('div');
+                adviceItem.className = 'advice-item';
+
+                // 이모지
+                const emojiSpan = document.createElement('span');
+                emojiSpan.className = 'advice-emoji';
+                emojiSpan.textContent = advice.emoji;
+
+                // 조언 텍스트
+                const textSpan = document.createElement('span');
+                textSpan.className = 'advice-text';
+                textSpan.textContent = advice.text;
+
+                // 줄바꿈
+                const brElement = document.createElement('br');
+
+                // 우선순위 태그
+                const prioritySpan = document.createElement('span');
+                prioritySpan.className = 'advice-priority';
+                prioritySpan.textContent = advice.priority === 'high' ? '긴급' : advice.priority === 'medium' ? '보통' : '낮음';
+
+                if (advice.priority === 'high') {
+                    prioritySpan.classList.add('priority-high');
+                } else if (advice.priority === 'medium') {
+                    prioritySpan.classList.add('priority-medium');
+                } else {
+                    prioritySpan.classList.add('priority-low');
+                }
+
+                adviceItem.appendChild(emojiSpan);
+                adviceItem.appendChild(textSpan);
+                adviceItem.appendChild(brElement);
+                adviceItem.appendChild(prioritySpan);
+
+                adviceList.appendChild(adviceItem);
+            });
+
+            document.getElementById('habitAdviceSection').style.display = 'block';
+        }
+
+        // 초기 데이터 로드 시 식습관 개선 조언도 함께 로드
+        async function loadReportData() {
+            try {
+                const token = localStorage.getItem('token');
+
+                // 기간 계산
+                const today = new Date();
+                let queryStartDate = new Date();
+                let queryEndDate = new Date(today);
+
+                if (currentPeriod === 'week') {
+                    queryStartDate.setDate(queryEndDate.getDate() - 7);
+                } else {
+                    // 월간: 현재 달의 1일부터 오늘까지
+                    queryStartDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    // queryEndDate는 이미 오늘 날짜
+                }
+
+                const startDateStr = queryStartDate.toISOString().split('T')[0];
+                const endDateStr = queryEndDate.toISOString().split('T')[0];
+
+                console.log('📅 조회 기간:', startDateStr, '~', endDateStr, '| 모드:', currentPeriod);
+
+                // API 호출
+                const response = await fetch(`/api/meal-records/period?userId=${userId}&startDate=${startDateStr}&endDate=${endDateStr}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const mealRecords = await response.json();
+
+                // 데이터 분석 및 표시
+                analyzeMealRecords(mealRecords, queryStartDate, queryEndDate);
+                displayMealRecords(mealRecords);
+                displayWeeklyChart(mealRecords, queryStartDate, queryEndDate);
+
+                // 식습관 개선 조언 로드
+                loadHabitAdvice();
+
+            } catch (error) {
+                console.error('레포트 데이터 로드 실패:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+

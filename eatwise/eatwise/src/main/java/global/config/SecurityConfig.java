@@ -17,9 +17,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .csrf(csrf -> csrf.disable())
-                .formLogin(login -> login.disable())
+                .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
-                .logout(logout -> logout.disable());
+                .logout(logout -> logout.disable())
+                .cors(cors -> cors.disable());
 
         return http.build();
     }

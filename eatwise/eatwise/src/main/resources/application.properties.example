@@ -31,10 +31,10 @@ spring.servlet.multipart.max-request-size=10MB
 # Jackson Configuration
 spring.jackson.serialization.write-dates-as-timestamps=false
 spring.jackson.time-zone=Asia/Seoul
-spring.jackson.default-property-inclusion=non_null
 
-# Data SQL Initialization
-spring.sql.init.mode=always
-spring.jpa.defer-datasource-initialization=true
-
+# Hugging Face Inference API Configuration (월 5,000회 무료)
+# 주의: 아래 API 키를 당신의 실제 API 키로 교체하세요
+# https://huggingface.co/settings/tokens 에서 생성하세요
+huggingface.api.key=${HUGGINGFACE_API_KEY:REPLACE_WITH_YOUR_API_KEY}
+huggingface.model.name=mistralai/Mistral-7B-Instruct-v0.2
 

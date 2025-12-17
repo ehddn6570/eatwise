@@ -17,6 +17,7 @@ public class GoalResponse {
     private Long goalId;
     private Long userId;
     private String username;
+    private Goal.GoalType goalType;
     private Double dailyCalorieTarget;
     private Double carbRatio;
     private Double proteinRatio;
@@ -29,6 +30,7 @@ public class GoalResponse {
                 .goalId(goal.getGoalId())
                 .userId(goal.getUser().getUserId())
                 .username(goal.getUser().getUsername())
+                .goalType(goal.getGoalType())
                 .dailyCalorieTarget(goal.getDailyCalorieTarget())
                 .carbRatio(goal.getCarbRatio())
                 .proteinRatio(goal.getProteinRatio())

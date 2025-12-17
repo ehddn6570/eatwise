@@ -12,9 +12,13 @@
             <h1 class="nav-logo">EatWise</h1>
             <div class="nav-menu">
                 <a href="/dashboard" class="nav-item active">대시보드</a>
-                <a href="#" class="nav-item">식단 기록</a>
-                <a href="#" class="nav-item">목표 관리</a>
-                <a href="#" class="nav-item">레포트</a>
+                <a href="/restaurant-map" class="nav-item">음식점 지도</a>
+                <a href="/report" class="nav-item">레포트</a>
+                <a href="/edit-profile" class="nav-item">정보 수정</a>
+                <button class="btn-notification" onclick="openNotifications()">
+                    🔔 알림
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
                 <button class="btn-logout" onclick="logout()">로그아웃</button>
             </div>
         </div>
@@ -27,20 +31,50 @@
         </div>
 
         <div class="dashboard-grid">
+            <!-- 달력 -->
+            <div class="card calendar-card">
+                <div class="card-header">
+                    <h3>식사 기록 달력</h3>
+                </div>
+                <div class="card-body">
+                    <div class="calendar-container">
+                        <div class="calendar-navigation">
+                            <button class="btn-prev" onclick="previousMonth()">◀</button>
+                            <h4 id="currentMonth">2025년 11월</h4>
+                            <button class="btn-next" onclick="nextMonth()">▶</button>
+                        </div>
+                        <div class="calendar">
+                            <div class="calendar-weekdays">
+                                <div class="weekday">일</div>
+                                <div class="weekday">월</div>
+                                <div class="weekday">화</div>
+                                <div class="weekday">수</div>
+                                <div class="weekday">목</div>
+                                <div class="weekday">금</div>
+                                <div class="weekday">토</div>
+                            </div>
+                            <div class="calendar-days" id="calendarDays"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 오늘의 칼로리 -->
             <div class="card">
                 <div class="card-header">
                     <h3>오늘의 칼로리</h3>
+                    <button class="btn-goal-setting" onclick="openGoalModal()">⚙️ 목표설정</button>
                 </div>
                 <div class="card-body">
                     <div class="calorie-info">
                         <div class="calorie-circle">
-                            <span class="calorie-number">0</span>
+                            <span class="calorie-number" id="todayCalories">0</span>
                             <span class="calorie-unit">kcal</span>
                         </div>
                         <div class="calorie-detail">
-                            <p>목표: <strong>2000 kcal</strong></p>
-                            <p>남은 칼로리: <strong>2000 kcal</strong></p>
+                            <p>목표: <strong id="calorieGoal">2000</strong> kcal</p>
+                            <p>남은 칼로리: <strong id="remainCalories">2000</strong> kcal</p>
+                            <p>어제 섭취 칼로리: <strong id="yesterdayCalories">0</strong> kcal</p>
                         </div>
                     </div>
                 </div>
@@ -50,84 +84,650 @@
             <div class="card">
                 <div class="card-header">
                     <h3>영양소 섭취</h3>
+                    <button class="btn-add" onclick="addMeal()">+ 식사 추가</button>
                 </div>
                 <div class="card-body">
                     <div class="nutrient-item">
                         <span>탄수화물</span>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: 0%"></div>
+                            <div class="progress-fill" id="carbsProgress" style="width: 0%"></div>
                         </div>
-                        <span>0g / 300g</span>
+                        <span><span id="carbsAmount">0</span>g / <span id="carbsGoal">300</span>g</span>
                     </div>
                     <div class="nutrient-item">
                         <span>단백질</span>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: 0%"></div>
+                            <div class="progress-fill" id="proteinProgress" style="width: 0%"></div>
                         </div>
-                        <span>0g / 100g</span>
+                        <span><span id="proteinAmount">0</span>g / <span id="proteinGoal">100</span>g</span>
                     </div>
                     <div class="nutrient-item">
                         <span>지방</span>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: 0%"></div>
+                            <div class="progress-fill" id="fatProgress" style="width: 0%"></div>
                         </div>
-                        <span>0g / 65g</span>
+                        <span><span id="fatAmount">0</span>g / <span id="fatGoal">65</span>g</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 최근 식사 기록 -->
-            <div class="card wide">
-                <div class="card-header">
-                    <h3>최근 식사 기록</h3>
-                    <button class="btn-add" onclick="addMeal()">+ 식사 추가</button>
-                </div>
-                <div class="card-body">
-                    <div class="empty-state">
-                        <p>아직 기록된 식사가 없습니다.</p>
-                        <p>첫 식사를 기록해보세요!</p>
-                    </div>
+            <!-- 최근 식사 기록 카드 제거됨 -->
+
+        </div>
+    </div>
+
+    <!-- 목표설정 모달 -->
+    <div id="goalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>목표 설정</h2>
+                <span class="close" onclick="closeGoalModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1rem; color: #666;">당신의 목표를 선택하세요</p>
+                <div class="goal-options">
+                    <button class="goal-btn" onclick="selectGoal('GAIN')">
+                        <div class="goal-icon">⬆️</div>
+                        <div class="goal-name">체중 증량</div>
+                        <div class="goal-desc">+300 kcal</div>
+                    </button>
+                    <button class="goal-btn" onclick="selectGoal('MAINTAIN')">
+                        <div class="goal-icon">➡️</div>
+                        <div class="goal-name">체중 유지</div>
+                        <div class="goal-desc">기본 칼로리</div>
+                    </button>
+                    <button class="goal-btn" onclick="selectGoal('LOSE')">
+                        <div class="goal-icon">⬇️</div>
+                        <div class="goal-name">체중 감량</div>
+                        <div class="goal-desc">-300 kcal</div>
+                    </button>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- 목표 달성률 -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>이번 주 목표</h3>
-                </div>
-                <div class="card-body">
-                    <div class="goal-item">
-                        <span>식사 기록</span>
-                        <span class="goal-progress">0 / 21</span>
-                    </div>
-                    <div class="goal-item">
-                        <span>칼로리 목표 달성</span>
-                        <span class="goal-progress">0 / 7</span>
-                    </div>
-                    <div class="goal-item">
-                        <span>균형잡힌 영양소</span>
-                        <span class="goal-progress">0 / 7</span>
-                    </div>
-                </div>
+    <!-- 알림 모달 -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>알림</h2>
+                <span class="close" onclick="closeNotifications()">&times;</span>
             </div>
-
-            <!-- 추천 식단 -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>오늘의 추천 식단</h3>
-                </div>
-                <div class="card-body">
-                    <div class="recommendation">
-                        <p>아침: 귀리 오트밀 + 과일</p>
-                        <p>점심: 현미밥 + 닭가슴살 샐러드</p>
-                        <p>저녁: 연어 구이 + 채소</p>
+            <div class="modal-body">
+                <div id="notificationList" style="max-height: 400px; overflow-y: auto;">
+                    <div style="text-align: center; color: #999; padding: 2rem;">
+                        <p>📬 읽지않은 알림이 없습니다.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 날짜별 식사 기록 수정 모달 -->
+    <div id="mealEditModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="mealEditTitle">2025년 11월 20일 식사 기록</h2>
+                <span class="close" onclick="closeMealEditModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                <div id="mealEditContent">
+                    <p>로딩 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 식사 기록 상세 수정 모달 -->
+    <div id="mealDetailEditModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>식사 기록 수정</h2>
+                <span class="close" onclick="closeMealDetailEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="mealDetailEditForm">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">음식명</label>
+                        <input type="text" id="editFoodName" readonly style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">식사 유형</label>
+                        <select id="editMealType" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="BREAKFAST">🌅 아침</option>
+                            <option value="LUNCH">☀️ 점심</option>
+                            <option value="DINNER">🌙 저녁</option>
+                            <option value="SNACK">🍪 간식</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">섭취 시간</label>
+                        <input type="time" id="editIntakeTime" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">수량 (g)</label>
+                        <input type="number" id="editQuantity" min="0.1" step="0.1" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+
+                    <div class="form-buttons" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" style="flex: 1; background: linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%); color: white; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            저장
+                        </button>
+                        <button type="button" onclick="closeMealDetailEditModal()" style="flex: 1; background: #e0e0e0; color: #333; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            취소
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let currentDate = new Date();
+        let mealRecords = {};  // 날짜별 식사 기록 저장
+        let todayMeals = [];   // 오늘의 식사 기록
+        let userInfo = null;   // 사용자 정보
+        let dailyGoals = {     // 일일 목표
+            calories: 2000,
+            carbs: 300,
+            protein: 100,
+            fat: 65
+        };
+
+        // 한국 시간(KST) 기준 오늘 날짜 문자열 반환 (YYYY-MM-DD)
+        function getTodayDateString() {
+            const now = new Date();
+            const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+            return kstDate.toISOString().split('T')[0];
+        }
+
+        // 마지막으로 로드한 날짜 초기화
+        let lastLoadedDate = getTodayDateString();
+
+        // 음식 카테고리를 한글로 변환
+        function getCategoryInKorean(category) {
+            const categoryMap = {
+                'korean': '한식',
+                'western': '양식',
+                'japanese': '일식',
+                'chinese': '중식',
+                'beverage': '음료',
+                '한식': '한식',
+                '양식': '양식',
+                '일식': '일식',
+                '중식': '중식',
+                '음료': '음료'
+            };
+            return categoryMap[category] || category || '기타';
+        }
+
+        // 사용자 정보 로드
+        window.onload = async function() {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    userInfo = JSON.parse(userStr);
+                    document.getElementById('username').textContent = userInfo.username || '사용자';
+
+                    // 사용자 정보 기반 칼로리 목표 계산
+                    calculateDailyGoals(userInfo);
+
+                    // 달력 초기화 및 식사 기록 로드
+                    await loadMealRecords(userInfo.userId || userInfo.id);
+                    renderCalendar();
+                    await loadTodayNutrients(userInfo.userId || userInfo.id);  // 오늘의 영양소 정보
+                    await loadYesterdayCalories(userInfo.userId || userInfo.id);  // 어제 칼로리 조회
+                    // 최근 식사 기록은 최근 식사 기록 카드가 제거되어 함수 호출 제거
+                } catch (e) {
+                    console.error('사용자 정보 파싱 실패:', e);
+                }
+            }
+
+            // 식사 기록 수정 폼 리스너 설정
+            setupMealDetailEditFormListener();
+
+            // 자정(00:00)에 칼로리 초기화하도록 설정
+            scheduleNextMidnight();
+        };
+
+        // 다음 자정까지의 시간(밀리초) 계산 (한국 시간 기준)
+        function getTimeUntilNextMidnight() {
+            const now = new Date();
+            const kstNow = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+
+            // 한국 시간으로 내일 자정 계산
+            const tomorrow = new Date(kstNow);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+
+            // UTC 기준으로 변환하여 현재 시간과 비교
+            const tomorrowUtc = new Date(tomorrow.getTime() - (9 * 60 * 60 * 1000));
+            const timeUntil = tomorrowUtc - now;
+
+            console.log(`⏰ 현재 KST: ${kstNow.toLocaleString('ko-KR')}`);
+            console.log(`⏰ 다음 자정 KST: ${tomorrow.toLocaleString('ko-KR')}`);
+            console.log(`⏰ 다음 자정까지 남은 시간: ${Math.floor(timeUntil / 1000)}초`);
+            return timeUntil;
+        }
+
+        // 자정에 칼로리 초기화 스케줄링
+        function scheduleNextMidnight() {
+            const timeUntilMidnight = getTimeUntilNextMidnight();
+
+            setTimeout(() => {
+                console.log('🌙 자정이 되었습니다. 칼로리를 초기화합니다.');
+                lastLoadedDate = getTodayDateString();
+
+                if (userInfo) {
+                    // 오늘의 영양소 정보 새로고침 (칼로리 0으로 초기화)
+                    loadTodayNutrients(userInfo.userId || userInfo.id);
+                    // 달력 새로고침
+                    loadMealRecords(userInfo.userId || userInfo.id).then(() => renderCalendar());
+                }
+
+                // 다음 자정을 위해 다시 스케줄링
+                scheduleNextMidnight();
+            }, timeUntilMidnight);
+        }
+
+        // 사용자 정보 기반 일일 칼로리 목표 계산 (Harris-Benedict 공식)
+        function calculateDailyGoals(user) {
+            let bmr = 0;
+
+            if (user.gender === 'M' || user.gender === 'male') {
+                // 남성: 88.362 + (13.397 × 체중) + (4.799 × 키) - (5.677 × 나이)
+                bmr = 88.362 + (13.397 * user.weight) + (4.799 * user.height) - (5.677 * (user.age || 30));
+            } else {
+                // 여성: 447.593 + (9.247 × 체중) + (3.098 × 키) - (4.330 × 나이)
+                bmr = 447.593 + (9.247 * user.weight) + (3.098 * user.height) - (4.330 * (user.age || 30));
+            }
+
+            // 활동량 계수 1.5 (보통 활동)
+            const tdee = Math.round(bmr * 1.5);
+
+            // 일일 목표 설정
+            dailyGoals.calories = tdee;
+            dailyGoals.carbs = Math.round(tdee * 0.5 / 4);    // 50% carbs, 1g = 4kcal
+            dailyGoals.protein = Math.round(tdee * 0.25 / 4);  // 25% protein
+            dailyGoals.fat = Math.round(tdee * 0.25 / 9);      // 25% fat, 1g = 9kcal
+
+            // UI 업데이트
+            document.getElementById('calorieGoal').textContent = dailyGoals.calories;
+            document.getElementById('carbsGoal').textContent = dailyGoals.carbs;
+            document.getElementById('proteinGoal').textContent = dailyGoals.protein;
+            document.getElementById('fatGoal').textContent = dailyGoals.fat;
+
+            console.log('📊 일일 목표 설정:', dailyGoals);
+        }
+
+        // 오늘의 식사 기록 조회
+        // 최근 식사 기록 조회 (최근 6개)
+        async function loadRecentMeals(userId) {
+            try {
+                // 최근 30일간의 식사 기록 조회
+                const endDate = new Date().toISOString().split('T')[0];
+                const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+                const response = await fetch(`/api/meal-records/user/${userId}/date-range?startDate=${startDate}&endDate=${endDate}`);
+
+                if (response.ok) {
+                    const allRecords = await response.json();
+                    // 최신 기록 순서로 정렬
+                    todayMeals = allRecords.sort((a, b) => {
+                        const dateTimeA = new Date(`${a.intakeDate}T${a.intakeTime}`);
+                        const dateTimeB = new Date(`${b.intakeDate}T${b.intakeTime}`);
+                        return dateTimeB - dateTimeA;
+                    }).slice(0, 6);  // 최근 6개만 선택
+                    console.log('📅 최근 식사 기록:', todayMeals);
+                    updateRecentMeals();
+                }
+            } catch (error) {
+                console.error('최근 식사 기록 조회 실패:', error);
+            }
+        }
+
+        // 오늘의 칼로리와 영양소 조회
+        async function loadTodayNutrients(userId) {
+            try {
+                const today = getTodayDateString();
+                console.log('📅 오늘 날짜 (한국시간):', today);
+                const response = await fetch(`/api/meal-records/user/${userId}/date/${today}`);
+
+                if (response.ok) {
+                    const todayRecords = await response.json();
+                    console.log('📅 오늘의 식사 기록 (영양소):', todayRecords);
+                    updateNutrientInfo(todayRecords);
+                }
+            } catch (error) {
+                console.error('오늘의 영양소 정보 조회 실패:', error);
+            }
+        }
+
+        // 어제 칼로리 조회
+        async function loadYesterdayCalories(userId) {
+            try {
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                // 어제 날짜를 한국 시간 기준으로 계산
+                const kstYesterday = new Date(yesterday.getTime() + (9 * 60 * 60 * 1000));
+                const yesterdayDate = kstYesterday.toISOString().split('T')[0];
+
+                console.log('📅 어제 날짜 (한국시간):', yesterdayDate);
+                const response = await fetch(`/api/meal-records/user/${userId}/date/${yesterdayDate}`);
+
+                if (response.ok) {
+                    const yesterdayRecords = await response.json();
+                    console.log('📅 어제의 식사 기록:', yesterdayRecords);
+
+                    // 어제 총 칼로리 계산
+                    let yesterdayCalories = 0;
+                    yesterdayRecords.forEach(meal => {
+                        yesterdayCalories += meal.totalCalories || 0;
+                    });
+
+                    // UI 업데이트
+                    document.getElementById('yesterdayCalories').textContent = Math.round(yesterdayCalories);
+                }
+            } catch (error) {
+                console.error('어제 칼로리 조회 실패:', error);
+            }
+        }
+
+        // 영양소 정보 업데이트 (오늘 기록만)
+        function updateNutrientInfo(todayRecords) {
+            let totalCalories = 0;
+            let totalCarbs = 0;
+            let totalProtein = 0;
+            let totalFat = 0;
+
+            console.log('📊 영양소 계산 시작:', todayRecords);
+
+            todayRecords.forEach(meal => {
+                totalCalories += meal.totalCalories || 0;
+                // 음식의 실제 영양소 정보 사용
+                if (meal.food) {
+                    const quantity = (meal.quantity || 1) / 100; // 그램을 기준으로 변환
+                    const carbsAdd = (meal.food.carbs || 0) * quantity;
+                    const proteinAdd = (meal.food.protein || 0) * quantity;
+                    const fatAdd = (meal.food.fat || 0) * quantity;
+
+                    console.log(`📝 ${meal.food.foodName}: carbs=${carbsAdd}, protein=${proteinAdd}, fat=${fatAdd}`);
+
+                    totalCarbs += carbsAdd;
+                    totalProtein += proteinAdd;
+                    totalFat += fatAdd;
+                } else {
+                    console.log('⚠️ food 정보 없음:', meal);
+                }
+            });
+
+            console.log(`✅ 총 영양소: carbs=${Math.round(totalCarbs)}, protein=${Math.round(totalProtein)}, fat=${Math.round(totalFat)}`);
+
+            // 칼로리 정보 업데이트
+            const remainCalories = dailyGoals.calories - totalCalories;
+            document.getElementById('todayCalories').textContent = Math.round(totalCalories);
+            document.getElementById('remainCalories').textContent = Math.max(0, Math.round(remainCalories));
+
+            // 영양소 정보 업데이트
+            const carbsPercent = Math.min(100, (totalCarbs / dailyGoals.carbs) * 100);
+            const proteinPercent = Math.min(100, (totalProtein / dailyGoals.protein) * 100);
+            const fatPercent = Math.min(100, (totalFat / dailyGoals.fat) * 100);
+
+            document.getElementById('carbsProgress').style.width = carbsPercent + '%';
+            document.getElementById('proteinProgress').style.width = proteinPercent + '%';
+            document.getElementById('fatProgress').style.width = fatPercent + '%';
+
+            document.getElementById('carbsAmount').textContent = totalCarbs.toFixed(1);
+            document.getElementById('proteinAmount').textContent = totalProtein.toFixed(1);
+            document.getElementById('fatAmount').textContent = totalFat.toFixed(1);
+        }
+
+        // 최근 식사 기록 업데이트
+        function updateRecentMeals() {
+            const container = document.getElementById('recentMealsContainer');
+
+            if (!todayMeals || todayMeals.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>아직 기록된 식사가 없습니다.</p><p>첫 식사를 기록해보세요!</p></div>';
+                return;
+            }
+
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem;">';
+            todayMeals.forEach((meal, index) => {
+                const mealTypeLabel = {
+                    'breakfast': '🌅 아침',
+                    'lunch': '☀️ 점심',
+                    'dinner': '🌙 저녁',
+                    'snack': '🍪 간식'
+                };
+
+                // 날짜, 식사 유형, 시간 포맷팅
+                let mealInfo = '';
+                if (meal.intakeDate && meal.intakeTime) {
+                    const timeParts = meal.intakeTime.split(':');
+                    const time = `${timeParts[0]}:${timeParts[1]}`;
+                    const mealTypeText = mealTypeLabel[meal.mealType] || meal.mealType;
+                    mealInfo = `${meal.intakeDate} ${mealTypeText} ${time}`;
+                } else if (meal.intakeDate) {
+                    const mealTypeText = mealTypeLabel[meal.mealType] || meal.mealType;
+                    mealInfo = `${meal.intakeDate} ${mealTypeText}`;
+                }
+
+                html += `
+                    <div style="background: #f7fbf1; padding: 1rem; border-radius: 8px; border-left: 4px solid #2E7D32;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <strong>${meal.foodName}</strong>
+                                <div style="color: #666; font-size: 0.9em; margin-top: 0.3rem;">${mealInfo}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: bold; color: #2E7D32;">${Math.round(meal.totalCalories)} kcal</div>
+                                <div style="color: #999; font-size: 0.85em;">${meal.quantity}g</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // 식사 기록 조회
+        async function loadMealRecords(userId) {
+            try {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+
+                // 로컬 시간 기준으로 월의 첫날과 마지막날 계산
+                const startDate = new Date(year, month, 1);
+                const endDate = new Date(year, month + 1, 0);
+
+                // YYYY-MM-DD 형식으로 변환
+                const startDateStr = startDate.getFullYear() + '-' +
+                                    String(startDate.getMonth() + 1).padStart(2, '0') + '-' +
+                                    String(startDate.getDate()).padStart(2, '0');
+
+                const endDateStr = endDate.getFullYear() + '-' +
+                                  String(endDate.getMonth() + 1).padStart(2, '0') + '-' +
+                                  String(endDate.getDate()).padStart(2, '0');
+
+                console.log('🔍 조회 범위:', startDateStr, '~', endDateStr);
+                console.log('🔍 userId:', userId);
+
+                const response = await fetch(`/api/meal-records/user/${userId}/date-range?startDate=${startDateStr}&endDate=${endDateStr}`);
+
+                console.log('📡 API 응답 상태:', response.status);
+
+                if (response.ok) {
+                    const records = await response.json();
+                    console.log('✅ API 응답 데이터:', records);
+
+                    // 날짜별로 그룹화
+                    mealRecords = {};
+                    records.forEach(record => {
+                        console.log('📝 식사 기록 처리:', record.intakeDate, record.foodName);
+                        if (!mealRecords[record.intakeDate]) {
+                            mealRecords[record.intakeDate] = [];
+                        }
+                        mealRecords[record.intakeDate].push(record);
+                    });
+
+                    console.log('📅 그룹화된 식사 기록:', Object.keys(mealRecords));
+                } else {
+                    console.error('❌ API 오류:', response.status);
+                    mealRecords = {};
+                }
+            } catch (error) {
+                console.error('❌ 식사 기록 조회 실패:', error);
+                mealRecords = {};
+            }
+        }
+
+        // 달력 렌더링
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            // 월 표시 업데이트
+            const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월',
+                              '7월', '8월', '9월', '10월', '11월', '12월'];
+            document.getElementById('currentMonth').textContent = `${year}년 ${monthNames[month]}`;
+
+            // 첫 날의 요일과 마지막 날짜
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            const calendarDaysDiv = document.getElementById('calendarDays');
+            calendarDaysDiv.innerHTML = '';
+
+            console.log(`📅 [달력 렌더링] ${year}년 ${month + 1}월`);
+            console.log(`📅 [로드된 식사 기록 날짜들]:`, Object.keys(mealRecords));
+
+            // 빈 칸 추가
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendarDaysDiv.appendChild(emptyDay);
+            }
+
+            // 날짜 추가
+            const today = new Date();
+            const mealTypeIcons = {
+                'breakfast': '🌅',
+                'BREAKFAST': '🌅',
+                'lunch': '☀️',
+                'LUNCH': '☀️',
+                'dinner': '🌙',
+                'DINNER': '🌙',
+                'snack': '🍪',
+                'SNACK': '🍪'
+            };
+            const mealTypeLabels = {
+                'breakfast': '아침',
+                'BREAKFAST': '아침',
+                'lunch': '점심',
+                'LUNCH': '점심',
+                'dinner': '저녁',
+                'DINNER': '저녁',
+                'snack': '간식',
+                'SNACK': '간식'
+            };
+
+            for (let date = 1; date <= lastDate; date++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day';
+
+                // YYYY-MM-DD 형식으로 날짜 생성
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+
+                // 오늘 날짜 강조
+                if (year === today.getFullYear() &&
+                    month === today.getMonth() &&
+                    date === today.getDate()) {
+                    dayDiv.classList.add('today');
+                }
+
+                // 식사 기록이 있는 날짜 확인
+                if (mealRecords[dateStr] && mealRecords[dateStr].length > 0) {
+                    console.log(`✅ [${dateStr}] 식사 기록 발견: ${mealRecords[dateStr].length}개`);
+                    dayDiv.classList.add('has-record');
+
+                    // 클릭 이벤트 추가
+                    dayDiv.style.cursor = 'pointer';
+                    dayDiv.addEventListener('click', () => {
+                        openMealEditModal(dateStr, mealRecords[dateStr]);
+                    });
+
+                    const dateLabel = document.createElement('div');
+                    dateLabel.className = 'day-date';
+                    dateLabel.textContent = date;
+                    dayDiv.appendChild(dateLabel);
+
+                    const foodInfo = document.createElement('div');
+                    foodInfo.className = 'day-foods';
+
+                    // 식사 유형과 음식명을 함께 표시
+                    const mealsByType = {};
+                    mealRecords[dateStr].forEach(r => {
+                        const type = (r.mealType || 'snack').toLowerCase();
+                        if (!mealsByType[type]) {
+                            mealsByType[type] = [];
+                        }
+                        mealsByType[type].push(r.foodName);
+                    });
+
+                    // 식사 유형별로 정렬하여 표시
+                    const foodTexts = [];
+                    ['breakfast', 'lunch', 'dinner', 'snack'].forEach(type => {
+                        if (mealsByType[type]) {
+                            const icon = mealTypeIcons[type] || '';
+                            const foods = mealsByType[type].join(', ');
+                            foodTexts.push(`${icon} ${foods}`);
+                        }
+                    });
+
+                    foodInfo.textContent = foodTexts.join('\n');
+                    dayDiv.appendChild(foodInfo);
+
+                    const calorieInfo = document.createElement('div');
+                    calorieInfo.className = 'day-calories';
+                    const totalCalories = mealRecords[dateStr].reduce((sum, r) => sum + (r.totalCalories || 0), 0);
+                    calorieInfo.textContent = Math.round(totalCalories) + ' kcal';
+                    dayDiv.appendChild(calorieInfo);
+                } else {
+                    // 빈 날짜: 날짜 번호만 표시
+                    dayDiv.textContent = date;
+
+                    // 빈 날짜도 클릭 가능하게 - 식사 추가
+                    dayDiv.style.cursor = 'pointer';
+                    dayDiv.addEventListener('click', () => {
+                        openAddMealForDateModal(dateStr);
+                    });
+                }
+
+                calendarDaysDiv.appendChild(dayDiv);
+            }
+        }
+
+        // 이전 달
+        async function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            await loadMealRecords(userInfo.userId || userInfo.id);
+            renderCalendar();
+        }
+
+        // 다음 달
+        async function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            await loadMealRecords(userInfo.userId || userInfo.id);
+            renderCalendar();
+        }
+
         // 로그아웃 기능
         function logout() {
             if (confirm('로그아웃 하시겠습니까?')) {
@@ -138,21 +738,382 @@
 
         // 식사 추가 기능
         function addMeal() {
-            alert('식사 추가 기능은 준비 중입니다.');
+            window.location.href = '/add-meal';
         }
 
-        // 사용자 정보 로드
-        window.onload = function() {
-            const userStr = localStorage.getItem('user');
-            if (userStr) {
-                try {
-                    const user = JSON.parse(userStr);
-                    document.getElementById('username').textContent = user.username || '사용자';
-                } catch (e) {
-                    console.error('사용자 정보 파싱 실패:', e);
+        // 목표설정 모달 열기
+        function openGoalModal() {
+            document.getElementById('goalModal').style.display = 'block';
+        }
+
+        // 목표설정 모달 닫기
+        function closeGoalModal() {
+            document.getElementById('goalModal').style.display = 'none';
+        }
+
+        // 목표 선택 및 저장
+        async function selectGoal(goalType) {
+            try {
+                const response = await fetch('/api/goals', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: userInfo.userId || userInfo.id,
+                        goalType: goalType,
+                        startDate: new Date().toISOString().split('T')[0],
+                        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                    })
+                });
+
+                if (response.ok) {
+                    const goal = await response.json();
+                    console.log('✅ 목표 설정 완료:', goal);
+
+                    // 칼로리 목표 업데이트
+                    dailyGoals.calories = Math.round(goal.dailyCalorieTarget);
+                    document.getElementById('calorieGoal').textContent = dailyGoals.calories;
+
+                    // 영양소 비율에 따라 목표 재계산
+                    const carbRatio = goal.carbRatio || 0.5;
+                    const proteinRatio = goal.proteinRatio || 0.25;
+                    const fatRatio = goal.fatRatio || 0.25;
+
+                    // 각 영양소의 목표 그램 수 계산
+                    dailyGoals.carbs = Math.round(goal.dailyCalorieTarget * carbRatio / 4);      // 1g = 4 kcal
+                    dailyGoals.protein = Math.round(goal.dailyCalorieTarget * proteinRatio / 4); // 1g = 4 kcal
+                    dailyGoals.fat = Math.round(goal.dailyCalorieTarget * fatRatio / 9);         // 1g = 9 kcal
+
+                    // UI 업데이트
+                    document.getElementById('carbsGoal').textContent = dailyGoals.carbs;
+                    document.getElementById('proteinGoal').textContent = dailyGoals.protein;
+                    document.getElementById('fatGoal').textContent = dailyGoals.fat;
+
+                    // 영양소 정보 재계산
+                    updateNutrientInfo(todayMeals);
+
+                    // 모달 닫기
+                    closeGoalModal();
+
+                    alert('목표가 설정되었습니다! 🎯');
+                } else {
+                    console.error('❌ 목표 설정 실패:', response.status);
+                    alert('목표 설정에 실패했습니다.');
                 }
+            } catch (error) {
+                console.error('❌ 목표 설정 중 오류:', error);
+                alert('목표 설정 중 오류가 발생했습니다.');
             }
-        };
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const goalModal = document.getElementById('goalModal');
+            const notificationModal = document.getElementById('notificationModal');
+            const mealEditModal = document.getElementById('mealEditModal');
+            const mealDetailEditModal = document.getElementById('mealDetailEditModal');
+
+            if (event.target === goalModal) {
+                closeGoalModal();
+            }
+            if (event.target === notificationModal) {
+                closeNotifications();
+            }
+            if (event.target === mealEditModal) {
+                closeMealEditModal();
+            }
+            if (event.target === mealDetailEditModal) {
+                closeMealDetailEditModal();
+            }
+        }
+
+        // 알림 함수들
+        function openNotifications() {
+            document.getElementById('notificationModal').style.display = 'block';
+            // 여기에 알림 목록 로드 로직 추가 가능
+        }
+
+        function closeNotifications() {
+            document.getElementById('notificationModal').style.display = 'none';
+        }
+
+        // 식사 기록 수정 모달 열기
+        function openMealEditModal(dateStr, meals) {
+            const modal = document.getElementById('mealEditModal');
+            const title = document.getElementById('mealEditTitle');
+            const content = document.getElementById('mealEditContent');
+
+            // 제목 설정
+            const date = new Date(dateStr + 'T00:00:00');
+            const formattedDate = date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'short'
+            });
+            title.textContent = `${formattedDate} 식사 기록`;
+
+            // 식사 기록 표시
+            displayMealEditContent(content, dateStr, meals);
+
+            // 모달 표시
+            modal.style.display = 'block';
+        }
+
+        // 식사 기록 수정 모달 닫기
+        function closeMealEditModal() {
+            document.getElementById('mealEditModal').style.display = 'none';
+        }
+
+        // 식사 기록 상세 수정 모달 닫기
+        function closeMealDetailEditModal() {
+            document.getElementById('mealDetailEditModal').style.display = 'none';
+        }
+
+        // 현재 수정 중인 식사 기록 ID 저장
+        let currentEditingMealRecordId = null;
+
+        // 식사 기록 내용 표시
+        function displayMealEditContent(container, dateStr, meals) {
+            const mealTypeEmoji = {
+                'BREAKFAST': '🌅',
+                'LUNCH': '☀️',
+                'DINNER': '🌙',
+                'SNACK': '🍪'
+            };
+
+            const mealTypeLabels = {
+                'BREAKFAST': '아침',
+                'LUNCH': '점심',
+                'DINNER': '저녁',
+                'SNACK': '간식'
+            };
+
+            // 식사를 유형별로 그룹화
+            const groupedMeals = {};
+            meals.forEach(meal => {
+                const type = (meal.mealType || 'SNACK').toUpperCase();
+                const key = `${type}_${meal.intakeTime}`;
+                if (!groupedMeals[key]) {
+                    groupedMeals[key] = {
+                        recordId: meal.recordId,
+                        mealType: type,
+                        intakeTime: meal.intakeTime,
+                        foods: []
+                    };
+                }
+                groupedMeals[key].foods.push(meal);
+            });
+
+            // HTML 생성
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem; box-sizing: border-box; width: 100%;">';
+
+            Object.values(groupedMeals).forEach(mealGroup => {
+                const emoji = mealTypeEmoji[mealGroup.mealType] || '🍽️';
+                const label = mealTypeLabels[mealGroup.mealType] || '식사';
+
+                html += `
+                    <div style="background: #f7fbf1; padding: 1rem; border-radius: 8px; border-left: 4px solid #2E7D32; box-sizing: border-box; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <div style="font-weight: 600; color: #333;">
+                                ${emoji} ${label} (${mealGroup.intakeTime})
+                            </div>
+                            <button class="btn-delete" onclick="deleteMealRecord(${mealGroup.recordId}, '${dateStr}')" style="background: #ff5252; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; flex-shrink: 0;">
+                                삭제
+                            </button>
+                        </div>
+                `;
+
+                // 음식 목록
+                mealGroup.foods.forEach(food => {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid rgba(46, 125, 50, 0.1); box-sizing: border-box; width: 100%;">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="color: #333; font-weight: 500; word-break: break-word;">${food.foodName}</div>
+                                <div style="color: #999; font-size: 0.85rem;">${food.quantity ? food.quantity + 'g' : ''}</div>
+                            </div>
+                            <div style="text-align: right; flex-shrink: 0; margin-left: 1rem;">
+                                <div style="color: #2E7D32; font-weight: 600;">${Math.round(food.totalCalories || 0)} kcal</div>
+                                <button class="btn-edit-meal" onclick="openEditMealDetailModal(${food.recordId}, '${food.foodName}', ${food.quantity}, '${mealGroup.mealType}', '${mealGroup.intakeTime}')" style="background: #2E7D32; color: white; border: none; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; margin-top: 0.3rem;">
+                                    수정
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            });
+
+            // 식사 추가 버튼
+            html += `
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd; display: flex; justify-content: stretch; box-sizing: border-box; width: 100%;">
+                    <button class="btn-add" onclick="addMealToDate('${dateStr}')" style="flex: 1; background: linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%); color: white; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                        + 식사 추가
+                    </button>
+                </div>
+            `;
+
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // 식사 기록 삭제
+        async function deleteMealRecord(recordId, dateStr) {
+            if (!confirm('이 식사 기록을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/meal-records/${recordId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    console.log('✅ 식사 기록 삭제 완료');
+                    alert('식사 기록이 삭제되었습니다.');
+
+                    // 달력 새로고침
+                    await loadMealRecords(userInfo.userId || userInfo.id);
+                    renderCalendar();
+
+                    // 모달 닫기
+                    closeMealEditModal();
+                } else {
+                    console.error('❌ 삭제 실패:', response.status);
+                    alert('삭제에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('❌ 삭제 중 오류:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 식사 기록 수정 폼 열기 (모달 형태)
+        function openEditMealDetailModal(recordId, foodName, quantity, mealType, intakeTime) {
+            currentEditingMealRecordId = recordId;
+
+            // 모달 입력 필드 채우기
+            document.getElementById('editFoodName').value = foodName;
+            document.getElementById('editMealType').value = mealType;
+            document.getElementById('editQuantity').value = quantity;
+
+            // 시간 포맷 변환 (HH:mm:ss -> HH:mm)
+            const timeOnly = intakeTime ? intakeTime.substring(0, 5) : '12:00';
+            document.getElementById('editIntakeTime').value = timeOnly;
+
+            // 모달 표시
+            document.getElementById('mealDetailEditModal').style.display = 'block';
+        }
+
+        // 식사 기록 수정 폼 제출 핸들러
+        function setupMealDetailEditFormListener() {
+            const form = document.getElementById('mealDetailEditForm');
+            if (form && !form.dataset.listenerAdded) {
+                form.dataset.listenerAdded = 'true';
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    if (currentEditingMealRecordId === null) {
+                        alert('오류: 수정할 식사 기록을 찾을 수 없습니다.');
+                        return;
+                    }
+
+                    const mealType = document.getElementById('editMealType').value;
+                    const intakeTime = document.getElementById('editIntakeTime').value + ':00';
+                    const quantity = parseFloat(document.getElementById('editQuantity').value);
+
+                    if (!mealType || !intakeTime || !quantity) {
+                        alert('모든 필드를 입력해주세요.');
+                        return;
+                    }
+
+                    await updateMealRecord(currentEditingMealRecordId, quantity, mealType, intakeTime);
+                    closeMealDetailEditModal();
+                });
+            }
+        }
+
+        // 식사 기록 수정
+        async function updateMealRecord(recordId, quantity, mealType, intakeTime) {
+            try {
+                const response = await fetch(`/api/meal-records/${recordId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quantity: quantity,
+                        mealType: mealType,
+                        intakeTime: intakeTime
+                    })
+                });
+
+                if (response.ok) {
+                    console.log('✅ 식사 기록 수정 완료');
+                    alert('식사 기록이 수정되었습니다.');
+
+                    // 달력 새로고침
+                    await loadMealRecords(userInfo.userId || userInfo.id);
+                    renderCalendar();
+
+                    // 오늘의 영양소 정보 새로고침
+                    await loadTodayNutrients(userInfo.userId || userInfo.id);
+
+                    // 모달 닫기
+                    closeMealEditModal();
+                } else {
+                    console.error('❌ 수정 실패:', response.status);
+                    alert('수정에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('❌ 수정 중 오류:', error);
+                alert('수정 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 빈 날짜에 식사 추가
+        function openAddMealForDateModal(dateStr) {
+            // 날짜를 포맷팅
+            const date = new Date(dateStr + 'T00:00:00');
+            const formattedDate = date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+
+            // 간단한 확인 후 식사 추가 페이지로 이동
+            const confirmed = confirm(`${formattedDate}에 식사를 추가하시겠습니까?`);
+            if (confirmed) {
+                // localStorage에 선택된 날짜 저장
+                localStorage.setItem('selectedMealDate', dateStr);
+                window.location.href = '/add-meal';
+            }
+        }
+
+        // 날짜에 새로운 식사 추가
+        function addMealToDate(dateStr) {
+            // localStorage에 선택된 날짜 저장
+            localStorage.setItem('selectedMealDate', dateStr);
+            closeMealEditModal();
+            window.location.href = '/add-meal';
+        }
+
+        // 알림 개수 업데이트 (임시 - 나중에 API로 변경)
+        function updateNotificationBadge() {
+            // 현재는 테스트용으로 0으로 설정
+            // 나중에 API에서 읽지않은 알림 개수를 받아서 업데이트
+            const unreadCount = 0;
+            document.getElementById('notificationBadge').textContent = unreadCount;
+        }
+
+        // 페이지 로드 시 알림 개수 업데이트
+        window.addEventListener('load', function() {
+            updateNotificationBadge();
+        });
     </script>
 </body>
 </html>

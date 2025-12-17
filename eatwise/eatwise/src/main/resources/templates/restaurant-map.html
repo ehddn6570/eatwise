@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatWise - 음식점 지도</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .coming-soon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
+        }
+
+        .coming-soon-card {
+            background: rgba(255,255,255,0.96);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(46, 125, 50, 0.1);
+            max-width: 600px;
+        }
+
+        .coming-soon-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .coming-soon-title {
+            font-size: 2rem;
+            color: #2E7D32;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .coming-soon-description {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .coming-soon-details {
+            background: #f7fbf1;
+            border-left: 4px solid #2E7D32;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .coming-soon-details h4 {
+            color: #2E7D32;
+            margin-bottom: 1rem;
+        }
+
+        .coming-soon-details ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .coming-soon-details li {
+            padding: 0.5rem 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        .coming-soon-details li:before {
+            content: "✓";
+            color: #2E7D32;
+            font-weight: bold;
+            margin-right: 0.8rem;
+        }
+
+        .btn-back-dashboard {
+            background: linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-back-dashboard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">EatWise</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-item">대시보드</a>
+                <a href="/restaurant-map" class="nav-item active">음식점 지도</a>
+                <a href="/report" class="nav-item">레포트</a>
+                <a href="/edit-profile" class="nav-item">정보 수정</a>
+                <button class="btn-notification" onclick="openNotifications()">
+                    🔔 알림
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="coming-soon-container">
+        <div class="coming-soon-card">
+            <div class="coming-soon-icon">🗺️</div>
+            <h1 class="coming-soon-title">구현 예정</h1>
+            <p class="coming-soon-description">
+                음식점 지도 기능은 현재 개발 중입니다.
+            </p>
+            <button class="btn-back-dashboard" onclick="goToDashboard()">
+                대시보드로 돌아가기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 대시보드로 이동
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+
+        // 알림 모달 열기
+        function openNotifications() {
+            alert('알림 기능은 준비 중입니다.');
+        }
+
+        // 알림 개수 업데이트 (테스트용)
+        function updateNotificationBadge() {
+            const unreadCount = 0;
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                badge.textContent = unreadCount;
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', function() {
+            updateNotificationBadge();
+        });
+    </script>
+</body>
+</html>
+

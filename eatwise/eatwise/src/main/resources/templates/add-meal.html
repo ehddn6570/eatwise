@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatWise - 식사 기록</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/add-meal.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">EatWise</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-item">대시보드</a>
+                <a href="/restaurant-map" class="nav-item">음식점 지도</a>
+                <a href="/report" class="nav-item">레포트</a>
+                <a href="/edit-profile" class="nav-item">정보 수정</a>
+                <button class="btn-notification" onclick="openNotifications()">
+                    🔔 알림
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 식사 추가 방법 선택 -->
+        <div id="methodSelectionPage" style="display: block;">
+            <div class="page-title">
+                <h1>식사 기록 방법 선택</h1>
+                <p>편한 방법으로 식사를 기록해주세요</p>
+            </div>
+
+            <div class="method-options-container">
+                <div class="method-card" onclick="showPage('manualInputPage')">
+                    <div class="method-icon">📝</div>
+                    <h3>직접 입력</h3>
+                    <p>음식명과 섭취량을 직접 입력하는 방법</p>
+                    <button type="button" class="btn btn-primary" style="pointer-events: none;">선택</button>
+                </div>
+
+                <div class="method-card disabled" onclick="showComingSoonAlert('영수증 참고')">
+                    <div class="method-icon">🧾</div>
+                    <h3>영수증 참고</h3>
+                    <p>영수증을 스캔하여 음식을 자동으로 인식합니다</p>
+                    <button type="button" class="btn btn-secondary" disabled style="pointer-events: none;">구현 예정</button>
+                </div>
+
+                <div class="method-card disabled" onclick="showComingSoonAlert('음식 사진 인식')">
+                    <div class="method-icon">📸</div>
+                    <h3>음식 사진 인식</h3>
+                    <p>음식 사진을 촬영하면 AI가 인식합니다</p>
+                    <button type="button" class="btn btn-secondary" disabled style="pointer-events: none;">구현 예정</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 직접 입력 폼 -->
+        <div id="manualInputPage" style="display: none;">
+            <div class="page-title">
+                <h1>식사 기록 추가 - 직접 입력</h1>
+                <p>오늘 먹은 음식을 기록해보세요</p>
+                <button type="button" class="btn-back" onclick="goBackToSelection()">← 돌아가기</button>
+            </div>
+
+            <div class="meal-record-card">
+                <form id="manualMealForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="intakeDate">섭취 날짜</label>
+                            <input type="date" id="intakeDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mealType">식사 유형</label>
+                            <select id="mealType" required>
+                                <option value="">-- 선택 --</option>
+                                <option value="breakfast">아침</option>
+                                <option value="lunch">점심</option>
+                                <option value="dinner">저녁</option>
+                                <option value="snack">간식</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="intakeTime">섭취 시간</label>
+                        <input type="time" id="intakeTime">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foodSearch">음식 검색</label>
+                        <div class="search-container">
+                            <input type="text" id="foodSearch" placeholder="음식명 입력" autocomplete="off">
+                            <div id="foodList" class="food-list"></div>
+                        </div>
+                    </div>
+
+                    <div id="selectedFoodInfo" class="selected-food-info" style="display: none;">
+                        <h3>선택된 음식</h3>
+                        <div class="food-info-item">
+                            <strong>음식명:</strong> <span id="selectedFoodName"></span>
+                        </div>
+                        <div class="food-info-item">
+                            <strong>100g 기준 칼로리:</strong> <span id="selectedFoodCalories"></span> kcal
+                        </div>
+                        <div class="food-info-item">
+                            <strong>영양소 (100g 기준):</strong>
+                            <ul>
+                                <li>탄수화물: <span id="selectedFoodCarbs"></span>g</li>
+                                <li>단백질: <span id="selectedFoodProtein"></span>g</li>
+                                <li>지방: <span id="selectedFoodFat"></span>g</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">섭취량 (g)</label>
+                        <input type="number" id="quantity" min="0.1" step="0.1" placeholder="예: 100" required>
+                    </div>
+
+                    <div id="calculatedNutrients" class="calculated-nutrients" style="display: none;">
+                        <h3>섭취 예상 영양소</h3>
+                        <div class="nutrient-info">
+                            <div class="nutrient-item">
+                                <span>칼로리</span>
+                                <strong id="calculatedCalories">0</strong> kcal
+                            </div>
+                            <div class="nutrient-item">
+                                <span>탄수화물</span>
+                                <strong id="calculatedCarbs">0</strong> g
+                            </div>
+                            <div class="nutrient-item">
+                                <span>단백질</span>
+                                <strong id="calculatedProtein">0</strong> g
+                            </div>
+                            <div class="nutrient-item">
+                                <span>지방</span>
+                                <strong id="calculatedFat">0</strong> g
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="foodId">
+                    <input type="hidden" id="userId">
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">기록 저장</button>
+                        <button type="button" class="btn btn-secondary" onclick="goBackToSelection()">취소</button>
+                    </div>
+
+                    <div id="manualSuccessMessage" class="success-message" style="display: none;">
+                        식사가 성공적으로 기록되었습니다!
+                    </div>
+                    <div id="manualErrorMessage" class="error-message" style="display: none;"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 영수증 참고 폼 -->
+        <div id="receiptPage" style="display: none;">
+            <div class="page-title">
+                <h1>식사 기록 추가 - 영수증 참고</h1>
+                <p>영수증 사진(PNG)을 촬영하면 날짜/시간이 자동으로 인식됩니다</p>
+                <button type="button" class="btn-back" onclick="goBackToSelection()">← 돌아가기</button>
+            </div>
+
+            <div class="meal-record-card">
+                <form id="receiptForm">
+                    <div class="form-group">
+                        <label for="receiptImage">영수증 사진 (PNG 형식만)</label>
+                        <div class="image-upload-area">
+                            <input type="file" id="receiptImage" accept=".png,image/png" style="display: none;">
+                            <div class="upload-placeholder" onclick="document.getElementById('receiptImage').click()">
+                                <div class="upload-icon">📷</div>
+                                <p>클릭하여 영수증 PNG 사진을 선택하세요</p>
+                                <p class="upload-hint">PNG 형식만 지원합니다</p>
+                            </div>
+                            <div id="imagePreview" style="display: none; margin-top: 1rem;">
+                                <img id="previewImg" src="" alt="미리보기" style="max-width: 100%; height: auto; border-radius: 8px; max-height: 400px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="recognizedInfoContainer" class="selected-food-info" style="display: none;">
+                        <h3>인식된 정보</h3>
+                        <div class="food-info-item">
+                            <strong>인식된 날짜:</strong> <span id="recognizedDate">-</span>
+                        </div>
+                        <div class="food-info-item">
+                            <strong>인식된 시간:</strong> <span id="recognizedTime">-</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="receiptMealType">식사 유형 *</label>
+                        <select id="receiptMealType" required>
+                            <option value="">-- 선택 --</option>
+                            <option value="breakfast">아침</option>
+                            <option value="lunch">점심</option>
+                            <option value="dinner">저녁</option>
+                            <option value="snack">간식</option>
+                        </select>
+                    </div>
+
+                    <div id="addedFoodsContainer" style="display: none; margin-top: 1.5rem;">
+                        <h3 style="color: #2E7D32; margin-bottom: 1rem;">자동으로 인식된 음식 목록</h3>
+                        <div id="addedFoodsList" style="display: grid; gap: 0.8rem;"></div>
+                    </div>
+
+                    <input type="hidden" id="receiptUserId">
+                    <input type="hidden" id="receiptOcrDate">
+                    <input type="hidden" id="receiptOcrTime">
+
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">저장</button>
+                        <button type="button" class="btn btn-secondary" onclick="goBackToSelection()">취소</button>
+                    </div>
+
+                    <div id="receiptSuccessMessage" class="success-message" style="display: none;">
+                        식사가 성공적으로 기록되었습니다!
+                    </div>
+                    <div id="receiptErrorMessage" class="error-message" style="display: none;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFood = null;
+        let recognizedDate = null;
+        let recognizedTime = null;
+        window.receiptFoods = [];
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // 선택된 날짜가 있으면 그것을 사용, 없으면 오늘 날짜 사용
+            const selectedDate = localStorage.getItem('selectedMealDate');
+            const today = selectedDate || new Date().toISOString().split('T')[0];
+
+            if (document.getElementById('intakeDate')) {
+                document.getElementById('intakeDate').value = today;
+            }
+            if (document.getElementById('receiptDate')) {
+                document.getElementById('receiptDate').value = today;
+            }
+
+            // 선택된 날짜 정보 제거
+            if (selectedDate) {
+                localStorage.removeItem('selectedMealDate');
+            }
+
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (document.getElementById('userId')) {
+                        document.getElementById('userId').value = user.userId || user.id || '';
+                    }
+                    if (document.getElementById('receiptUserId')) {
+                        document.getElementById('receiptUserId').value = user.userId || user.id || '';
+                    }
+                } catch (e) {
+                    console.error('사용자 정보 파싱 실패:', e);
+                }
+            }
+
+            // 음식 검색
+            const foodSearch = document.getElementById('foodSearch');
+            if (foodSearch) {
+                let currentFocusIndex = -1;
+
+                let searchAbortController = null;  // 이전 요청 취소용
+
+                foodSearch.addEventListener('input', async function(e) {
+                    const searchText = e.target.value.trim();
+                    const foodListDiv = document.getElementById('foodList');
+                    currentFocusIndex = -1;
+
+                    // 이전 요청이 있으면 취소
+                    if (searchAbortController) {
+                        searchAbortController.abort();
+                    }
+
+                    // 먼저 이전 결과를 완전히 초기화
+                    foodListDiv.innerHTML = '';
+
+                    if (searchText.length === 0) {
+                        return;
+                    }
+
+                    try {
+                        console.log('🔍 검색 시작:', searchText, '(시간:', new Date().toLocaleTimeString(), ')');
+
+                        // 새로운 AbortController 생성 (이전 요청 취소용)
+                        searchAbortController = new AbortController();
+
+                        const response = await fetch(`/api/foods/search?keyword=${encodeURIComponent(searchText)}`, {
+                            signal: searchAbortController.signal
+                        });
+
+                        console.log('📡 API 응답:', response.status, '(검색어:', searchText, ')');
+
+                        if (response.ok) {
+                            const foods = await response.json();
+                            console.log('✅ DB 결과:', foods.map(f => f.foodName), '(총', foods.length, '개)');
+
+                            // 현재 입력값과 API 응답 검색어가 일치하는지 확인
+                            const currentInput = document.getElementById('foodSearch').value.trim();
+                            if (currentInput !== searchText) {
+                                console.log('⚠️ 검색어 변경됨. 응답 무시 (현재:', currentInput, ', API:', searchText, ')');
+                                return;
+                            }
+
+                            // 입력한 단어를 정확하게 포함하는 음식만 필터링
+                            const filteredFoods = foods.filter(food => {
+                                return food.foodName.includes(searchText);
+                            });
+
+                            console.log('✅ 필터링 결과:', filteredFoods.map(f => f.foodName), '(총', filteredFoods.length, '개)');
+
+                            if (filteredFoods.length > 0) {
+                                foodListDiv.innerHTML = filteredFoods.slice(0, 10).map((food, idx) => `
+                                    <div class="food-item" data-index="${idx}" onclick="selectFood(${food.foodId}, '${food.foodName.replace(/'/g, "\\'")}', '${food.category.replace(/'/g, "\\'")}', ${food.calories}, ${food.carbs}, ${food.protein}, ${food.fat})">
+                                        <div class="food-name">${food.foodName}</div>
+                                        <div class="food-calories">${food.calories} kcal/100g</div>
+                                    </div>
+                                `).join('');
+                                foodListDiv.style.opacity = '0.8';
+                                foodListDiv.style.display = 'block';
+                            } else {
+                                console.warn('⚠️ 필터링 결과 없음');
+                                foodListDiv.innerHTML = '<div style="padding: 1rem; text-align: center; color: #999;">검색 결과가 없습니다.</div>';
+                                foodListDiv.style.display = 'block';
+                            }
+                        } else {
+                            console.error('❌ API 오류:', response.status);
+                            foodListDiv.innerHTML = '';
+                        }
+                    } catch (error) {
+                        if (error.name === 'AbortError') {
+                            console.log('⏹️ 이전 요청 취소됨');
+                        } else {
+                            console.error('❌ 검색 실패:', error);
+                            foodListDiv.innerHTML = '';
+                        }
+                    }
+                });
+
+                // 키보드 네비게이션
+                foodSearch.addEventListener('keydown', function(e) {
+                    const foodListDiv = document.getElementById('foodList');
+                    const items = foodListDiv.querySelectorAll('.food-item');
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        currentFocusIndex = Math.min(currentFocusIndex + 1, items.length - 1);
+                        updateFocus(items, currentFocusIndex);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        currentFocusIndex = Math.max(currentFocusIndex - 1, -1);
+                        updateFocus(items, currentFocusIndex);
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (currentFocusIndex >= 0 && items[currentFocusIndex]) {
+                            items[currentFocusIndex].click();
+                        }
+                    } else if (e.key === 'Escape') {
+                        foodListDiv.innerHTML = '';
+                        currentFocusIndex = -1;
+                    }
+                });
+
+                function updateFocus(items, index) {
+                    items.forEach((item, i) => {
+                        if (i === index) {
+                            item.classList.add('focused');
+                            item.scrollIntoView({ block: 'nearest' });
+                        } else {
+                            item.classList.remove('focused');
+                        }
+                    });
+                }
+            }
+
+            // 섭취량 계산
+            const quantity = document.getElementById('quantity');
+            if (quantity) {
+                quantity.addEventListener('input', function() {
+                    if (!selectedFood) {
+                        document.getElementById('calculatedNutrients').style.display = 'none';
+                        return;
+                    }
+
+                    const qty = parseFloat(this.value) || 0;
+                    if (qty <= 0) {
+                        document.getElementById('calculatedNutrients').style.display = 'none';
+                        return;
+                    }
+
+                    const ratio = qty / 100;
+                    document.getElementById('calculatedCalories').textContent = (selectedFood.calories * ratio).toFixed(1);
+                    document.getElementById('calculatedCarbs').textContent = (selectedFood.carbs * ratio).toFixed(1);
+                    document.getElementById('calculatedProtein').textContent = (selectedFood.protein * ratio).toFixed(1);
+                    document.getElementById('calculatedFat').textContent = (selectedFood.fat * ratio).toFixed(1);
+                    document.getElementById('calculatedNutrients').style.display = 'block';
+                });
+            }
+
+            // 직접 입력 폼 제출
+            const manualForm = document.getElementById('manualMealForm');
+            if (manualForm) {
+                manualForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    if (!selectedFood) {
+                        document.getElementById('manualErrorMessage').textContent = '음식을 선택해주세요.';
+                        document.getElementById('manualErrorMessage').style.display = 'block';
+                        return;
+                    }
+
+                    const intakeTimeValue = document.getElementById('intakeTime').value;
+                    let intakeTime = null;
+
+                    if (intakeTimeValue) {
+                        // HH:mm 형식을 HH:mm:ss로 변환
+                        intakeTime = intakeTimeValue + ':00';
+                    }
+
+                    const formData = {
+                        userId: parseInt(document.getElementById('userId').value),
+                        foodId: parseInt(document.getElementById('foodId').value),
+                        mealType: document.getElementById('mealType').value,
+                        intakeDate: document.getElementById('intakeDate').value,
+                        intakeTime: intakeTime,
+                        quantity: parseFloat(document.getElementById('quantity').value)
+                    };
+
+                    try {
+                        const response = await fetch('/api/meal-records', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (response.ok) {
+                            document.getElementById('manualSuccessMessage').style.display = 'block';
+                            setTimeout(() => window.location.href = '/dashboard', 2000);
+                        } else {
+                            const error = await response.json();
+                            document.getElementById('manualErrorMessage').textContent = error.message || '저장 실패';
+                            document.getElementById('manualErrorMessage').style.display = 'block';
+                        }
+                    } catch (error) {
+                        document.getElementById('manualErrorMessage').textContent = '서버 연결 실패';
+                        document.getElementById('manualErrorMessage').style.display = 'block';
+                    }
+                });
+            }
+
+            // 영수증 이미지 처리
+            const receiptImage = document.getElementById('receiptImage');
+            if (receiptImage) {
+                receiptImage.addEventListener('change', async function(e) {
+                    const file = e.target.files[0];
+                    if (file && file.type === 'image/png') {
+                        const reader = new FileReader();
+                        reader.onload = async function(event) {
+                            document.getElementById('previewImg').src = event.target.result;
+                            document.getElementById('imagePreview').style.display = 'block';
+
+                            // OCR로 날짜/시간 및 음식명 인식
+                            try {
+                                console.log('OCR 시작...');
+                                const result = await Tesseract.recognize(event.target.result, 'kor+eng');
+                                const text = result.data.text;
+                                console.log('인식된 텍스트:', text);
+
+                                // 날짜 형식으로 직접 찾기
+                                const datePatterns = [
+                                    /(\d{4})\s*[-년]\s*(\d{1,2})\s*[-월]\s*(\d{1,2})/,
+                                    /(\d{4})[.-\/]\s*(\d{1,2})[.-\/]\s*(\d{1,2})/,
+                                    /(\d{2})[.-\/]\s*(\d{1,2})/
+                                ];
+
+                                for (let pattern of datePatterns) {
+                                    const dateMatch = text.match(pattern);
+                                    if (dateMatch) {
+                                        if (dateMatch[1].length === 4) {
+                                            recognizedDate = `${dateMatch[1]}-${String(dateMatch[2]).padStart(2, '0')}-${String(dateMatch[3]).padStart(2, '0')}`;
+                                        } else if (dateMatch[1].length === 2) {
+                                            const year = new Date().getFullYear();
+                                            recognizedDate = `${year}-${String(dateMatch[1]).padStart(2, '0')}-${String(dateMatch[2]).padStart(2, '0')}`;
+                                        }
+                                        if (recognizedDate) {
+                                            console.log('✓ 날짜 추출됨:', recognizedDate);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // 시간 형식으로 직접 찾기
+                                const timePatterns = [
+                                    /(\d{1,2})\s*[:시]\s*(\d{2})\s*[:분]?\s*(\d{2})?/,
+                                    /(\d{1,2}):(\d{2})(?::(\d{2}))?/,
+                                    /(\d{1,2})시\s*(\d{1,2})분/
+                                ];
+
+                                for (let pattern of timePatterns) {
+                                    const timeMatch = text.match(pattern);
+                                    if (timeMatch) {
+                                        const hours = String(timeMatch[1]).padStart(2, '0');
+                                        const minutes = String(timeMatch[2]).padStart(2, '0');
+                                        const seconds = timeMatch[3] ? String(timeMatch[3]).padStart(2, '0') : '00';
+                                        recognizedTime = `${hours}:${minutes}:${seconds}`;
+                                        console.log('✓ 시간 추출됨:', recognizedTime);
+                                        break;
+                                    }
+                                }
+
+                                // 음식명 자동 추출 및 검색
+                                await autoSearchAndAddFoods(text);
+
+                                // 인식된 정보 표시
+                                if (recognizedDate || recognizedTime) {
+                                    document.getElementById('recognizedDate').textContent = recognizedDate || '-';
+                                    document.getElementById('recognizedTime').textContent = recognizedTime || '-';
+                                    document.getElementById('recognizedInfoContainer').style.display = 'block';
+                                }
+                            } catch (error) {
+                                console.error('OCR 실패:', error);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('PNG 형식의 파일만 선택할 수 있습니다.');
+                        document.getElementById('receiptImage').value = '';
+                    }
+                });
+            }
+
+            // 영수증 폼 제출
+            const receiptForm = document.getElementById('receiptForm');
+            if (receiptForm) {
+                receiptForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    if (!document.getElementById('receiptImage').files[0]) {
+                        document.getElementById('receiptErrorMessage').textContent = 'PNG 형식의 영수증 사진을 선택해주세요';
+                        document.getElementById('receiptErrorMessage').style.display = 'block';
+                        return;
+                    }
+
+                    const receiptMealType = document.getElementById('receiptMealType').value;
+
+                    if (!receiptMealType) {
+                        document.getElementById('receiptErrorMessage').textContent = '식사 유형을 선택해주세요';
+                        document.getElementById('receiptErrorMessage').style.display = 'block';
+                        return;
+                    }
+
+                    if (!window.receiptFoods || window.receiptFoods.length === 0) {
+                        document.getElementById('receiptErrorMessage').textContent = '음식을 하나 이상 추가해주세요';
+                        document.getElementById('receiptErrorMessage').style.display = 'block';
+                        return;
+                    }
+
+                    if (!recognizedDate || !recognizedTime) {
+                        document.getElementById('receiptErrorMessage').textContent = '영수증에서 날짜/시간을 인식할 수 없습니다.';
+                        document.getElementById('receiptErrorMessage').style.display = 'block';
+                        return;
+                    }
+
+                    try {
+                        for (let food of window.receiptFoods) {
+                            const formData = {
+                                userId: parseInt(document.getElementById('receiptUserId').value),
+                                foodId: food.foodId,
+                                mealType: receiptMealType,
+                                intakeDate: recognizedDate,
+                                intakeTime: recognizedTime,
+                                quantity: 100
+                            };
+
+                            const response = await fetch('/api/meal-records', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify(formData)
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`음식 저장 실패: ${food.foodName}`);
+                            }
+                        }
+
+                        document.getElementById('receiptSuccessMessage').style.display = 'block';
+                        document.getElementById('receiptErrorMessage').style.display = 'none';
+                        setTimeout(() => window.location.href = '/dashboard', 2000);
+                    } catch (error) {
+                        document.getElementById('receiptErrorMessage').textContent = `저장 실패: ${error.message}`;
+                        document.getElementById('receiptErrorMessage').style.display = 'block';
+                    }
+                });
+            }
+        });
+
+        // 구현 예정 알림 표시
+        function showComingSoonAlert(featureName) {
+            alert(`${featureName} 기능은 준비 중입니다.\n곧 사용하실 수 있습니다. 😊`);
+        }
+
+        // 페이지 전환
+        function showPage(pageId) {
+            document.getElementById('methodSelectionPage').style.display = 'none';
+            document.getElementById('manualInputPage').style.display = 'none';
+            document.getElementById('receiptPage').style.display = 'none';
+            document.getElementById(pageId).style.display = 'block';
+        }
+
+        function goBackToSelection() {
+            showPage('methodSelectionPage');
+        }
+
+        // 음식 선택
+        function selectFood(foodId, foodName, category, calories, carbs, protein, fat) {
+            selectedFood = { foodId, foodName, category, calories, carbs, protein, fat };
+            document.getElementById('foodId').value = foodId;
+            document.getElementById('foodSearch').value = foodName;
+            document.getElementById('foodList').innerHTML = '';
+            document.getElementById('selectedFoodName').textContent = foodName;
+            document.getElementById('selectedFoodCalories').textContent = calories;
+            document.getElementById('selectedFoodCarbs').textContent = carbs;
+            document.getElementById('selectedFoodProtein').textContent = protein;
+            document.getElementById('selectedFoodFat').textContent = fat;
+            document.getElementById('selectedFoodInfo').style.display = 'block';
+        }
+
+        // 영수증에서 음식명 자동 추출 및 검색
+        async function autoSearchAndAddFoods(text) {
+            console.log('Claude AI를 사용한 음식 추출 시작...');
+            window.receiptFoods = [];
+
+            try {
+                console.log('백엔드 API 호출: /api/foods/extract-from-ocr');
+
+                const response = await fetch('/api/foods/extract-from-ocr', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(text)
+                });
+
+                console.log('API 응답 상태:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API 호출 실패:', response.status, errorText);
+                    return;
+                }
+
+                const foods = await response.json();
+                console.log('✓ Claude가 추출한 음식 수:', foods.length);
+                console.log('추출된 음식:', foods);
+
+                if (foods && foods.length > 0) {
+                    for (let food of foods) {
+                        const exists = window.receiptFoods.find(f => f.foodId === food.foodId);
+                        if (!exists) {
+                            window.receiptFoods.push({
+                                foodId: food.foodId,
+                                foodName: food.foodName,
+                                calories: food.calories,
+                                carbs: food.carbs,
+                                protein: food.protein,
+                                fat: food.fat
+                            });
+                            console.log('✅ 자동 추가됨:', food.foodName);
+                        }
+                    }
+                } else {
+                    console.warn('Claude가 추출한 음식이 없습니다.');
+                }
+
+                console.log('🎉 최종 추가된 음식 목록:', window.receiptFoods);
+                console.log('추가된 음식 개수:', window.receiptFoods.length);
+
+                if (window.receiptFoods.length > 0) {
+                    updateReceiptFoodsList();
+                }
+            } catch (error) {
+                console.error('음식 추출 오류:', error);
+            }
+        }
+
+        function updateReceiptFoodsList() {
+            const container = document.getElementById('addedFoodsContainer');
+            const list = document.getElementById('addedFoodsList');
+
+            if (!window.receiptFoods || window.receiptFoods.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            list.innerHTML = window.receiptFoods.map((food, idx) => `
+                <div style="background: #f7fbf1; padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${food.foodName}</strong>
+                        <div style="font-size: 0.9em; color: #666;">칼로리: ${food.calories} kcal/100g</div>
+                    </div>
+                    <button type="button" onclick="removeReceiptFood(${idx})" style="background: #ff6b6b; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">제거</button>
+                </div>
+            `).join('');
+        }
+
+        function removeReceiptFood(idx) {
+            if (window.receiptFoods) {
+                window.receiptFoods.splice(idx, 1);
+                updateReceiptFoodsList();
+            }
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+
+        // 알림 모달 열기
+        function openNotifications() {
+            alert('알림 기능은 준비 중입니다.');
+        }
+
+        // 알림 개수 업데이트 (테스트용)
+        function updateNotificationBadge() {
+            const unreadCount = 0;
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                badge.textContent = unreadCount;
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', function() {
+            updateNotificationBadge();
+        });
+    </script>
+
+    <!-- Tesseract.js OCR 라이브러리 -->
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@v4.1.1/dist/tesseract.min.js'></script>
+</body>
+</html>
+

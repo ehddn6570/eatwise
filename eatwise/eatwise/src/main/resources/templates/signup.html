@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatWise - 회원가입</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="signup-box">
+            <h1>EatWise</h1>
+            <p class="subtitle">회원가입</p>
+
+            <form id="signupForm" class="signup-form">
+                <div class="form-group">
+                    <label for="username">이름</label>
+                    <input type="text" id="username" name="username" placeholder="이름을 입력하세요" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <div class="email-check-wrapper">
+                        <div class="email-autocomplete-wrapper">
+                            <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required autocomplete="off">
+                            <ul id="emailSuggestions" class="email-suggestions-list" style="display: none;"></ul>
+                        </div>
+                        <button type="button" id="emailCheckBtn" class="btn-email-check">중복확인</button>
+                    </div>
+                    <div id="emailCheckStatus" class="email-check-status" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                    <div class="password-requirements" id="passwordRequirements" style="display: none;">
+                        <p class="requirement" id="lengthReq">✗ 8자 이상</p>
+                        <p class="requirement" id="numberReq">✗ 숫자 포함</p>
+                        <p class="requirement" id="letterReq">✗ 영문 포함</p>
+                        <p class="requirement" id="specialReq">✗ 특수문자 포함</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">나이</label>
+                    <input type="number" id="age" name="age" placeholder="나이를 입력하세요" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">성별</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">선택하세요</option>
+                        <option value="male">남성</option>
+                        <option value="female">여성</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="height">키 (cm)</label>
+                        <input type="number" step="0.1" id="height" name="height" placeholder="키" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weight">몸무게 (kg)</label>
+                        <input type="number" step="0.1" id="weight" name="weight" placeholder="몸무게" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">회원가입</button>
+            </form>
+
+            <div class="divider">
+                <span>이미 계정이 있으신가요?</span>
+            </div>
+
+            <a href="/login" class="btn btn-secondary">로그인하기</a>
+
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+            <div class="success-message" id="successMessage" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 이메일 자동완성 목록
+        const emailDomains = [
+            'daum.net',
+            'dreamwiz.com',
+            'gmail.com',
+            'hanmail.net',
+            'korea.com',
+            'nate.com',
+            'naver.com',
+            'netian.com',
+            'outlook.com',
+            'paran.com',
+            'yahoo.co.kr'
+        ];
+
+        const emailInput = document.getElementById('email');
+        const emailSuggestions = document.getElementById('emailSuggestions');
+        const emailCheckBtn = document.getElementById('emailCheckBtn');
+        const emailCheckStatus = document.getElementById('emailCheckStatus');
+
+        let isEmailVerified = false; // 이메일 중복 확인 상태
+
+        // 이메일 입력시 자동완성 표시
+        emailInput.addEventListener('input', function() {
+            const inputValue = this.value.trim();
+
+            if (inputValue.length === 0) {
+                emailSuggestions.style.display = 'none';
+                return;
+            }
+
+            // @ 기호가 있는 경우
+            if (inputValue.includes('@')) {
+                const [name, domain] = inputValue.split('@');
+                const filteredDomains = emailDomains.filter(d =>
+                    d.toLowerCase().startsWith(domain.toLowerCase())
+                );
+
+                if (filteredDomains.length > 0) {
+                    emailSuggestions.innerHTML = '';
+                    filteredDomains.forEach(domain => {
+                        const li = document.createElement('li');
+                        li.textContent = name + '@' + domain;
+                        li.addEventListener('click', function() {
+                            emailInput.value = this.textContent;
+                            emailSuggestions.style.display = 'none';
+                        });
+                        emailSuggestions.appendChild(li);
+                    });
+                    emailSuggestions.style.display = 'block';
+                } else {
+                    emailSuggestions.style.display = 'none';
+                }
+            } else {
+                // @ 기호가 없는 경우, 모든 도메인 제안
+                emailSuggestions.innerHTML = '';
+                emailDomains.forEach(domain => {
+                    const li = document.createElement('li');
+                    li.textContent = inputValue + '@' + domain;
+                    li.addEventListener('click', function() {
+                        emailInput.value = this.textContent;
+                        emailSuggestions.style.display = 'none';
+                    });
+                    emailSuggestions.appendChild(li);
+                });
+                emailSuggestions.style.display = 'block';
+            }
+        });
+
+        // 입력란 포커스 아웃시 드롭다운 닫기
+        emailInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                emailSuggestions.style.display = 'none';
+            }, 200);
+        });
+
+        // 입력란 포커스시 값이 있으면 드롭다운 표시
+        emailInput.addEventListener('focus', function() {
+            if (this.value.length > 0) {
+                emailSuggestions.style.display = 'block';
+            }
+        });
+
+        // 이메일 중복 확인 버튼 클릭 이벤트
+        emailCheckBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+
+            if (email.length === 0) {
+                emailCheckStatus.textContent = '이메일을 입력하세요.';
+                emailCheckStatus.className = 'email-check-status error';
+                emailCheckStatus.style.display = 'block';
+                isEmailVerified = false;
+                return;
+            }
+
+            if (!email.includes('@')) {
+                emailCheckStatus.textContent = '올바른 이메일 형식을 입력하세요.';
+                emailCheckStatus.className = 'email-check-status error';
+                emailCheckStatus.style.display = 'block';
+                isEmailVerified = false;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/check-email/${encodeURIComponent(email)}`);
+                const data = await response.json();
+
+                if (data.exists) {
+                    emailCheckStatus.textContent = '이미 사용 중인 이메일입니다.';
+                    emailCheckStatus.className = 'email-check-status error';
+                    isEmailVerified = false;
+                } else {
+                    emailCheckStatus.textContent = '사용 가능한 이메일입니다.';
+                    emailCheckStatus.className = 'email-check-status success';
+                    isEmailVerified = true;
+                }
+                emailCheckStatus.style.display = 'block';
+            } catch (error) {
+                emailCheckStatus.textContent = '이메일 확인 중 오류가 발생했습니다.';
+                emailCheckStatus.className = 'email-check-status error';
+                emailCheckStatus.style.display = 'block';
+                isEmailVerified = false;
+            }
+        });
+
+        // 비밀번호 유효성 검사
+        const passwordInput = document.getElementById('password');
+        const passwordRequirements = document.getElementById('passwordRequirements');
+        const lengthReq = document.getElementById('lengthReq');
+        const numberReq = document.getElementById('numberReq');
+        const letterReq = document.getElementById('letterReq');
+        const specialReq = document.getElementById('specialReq');
+
+        passwordInput.addEventListener('focus', function() {
+            passwordRequirements.style.display = 'block';
+        });
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+
+            // 길이 체크 (8자 이상)
+            const hasLength = password.length >= 8;
+            lengthReq.textContent = hasLength ? '✓ 8자 이상' : '✗ 8자 이상';
+            lengthReq.className = hasLength ? 'requirement met' : 'requirement';
+
+            // 숫자 체크
+            const hasNumber = /\d/.test(password);
+            numberReq.textContent = hasNumber ? '✓ 숫자 포함' : '✗ 숫자 포함';
+            numberReq.className = hasNumber ? 'requirement met' : 'requirement';
+
+            // 영문 체크 (대문자 또는 소문자)
+            const hasLetter = /[a-zA-Z]/.test(password);
+            letterReq.textContent = hasLetter ? '✓ 영문 포함' : '✗ 영문 포함';
+            letterReq.className = hasLetter ? 'requirement met' : 'requirement';
+
+            // 특수문자 체크
+            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+            specialReq.textContent = hasSpecial ? '✓ 특수문자 포함' : '✗ 특수문자 포함';
+            specialReq.className = hasSpecial ? 'requirement met' : 'requirement';
+        });
+
+        passwordInput.addEventListener('blur', function() {
+            if (this.value.length === 0) {
+                passwordRequirements.style.display = 'none';
+            }
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            // 이메일 중복 확인 여부 체크
+            if (!isEmailVerified) {
+                errorMessage.textContent = '이메일 중복 확인을 해주세요.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // 비밀번호 유효성 검사
+            const hasLength = password.length >= 8;
+            const hasNumber = /\d/.test(password);
+            const hasLetter = /[a-zA-Z]/.test(password);
+            const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+            if (!hasLength || !hasNumber || !hasLetter || !hasSpecial) {
+                errorMessage.textContent = '비밀번호는 8자 이상이며, 숫자, 영문, 특수문자를 모두 포함해야 합니다.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        age: age,
+                        gender: gender,
+                        height: height,
+                        weight: weight
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    successMessage.textContent = '회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.';
+                    successMessage.style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    errorMessage.textContent = error.message || '회원가입에 실패했습니다.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                errorMessage.textContent = '서버와의 연결에 실패했습니다.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

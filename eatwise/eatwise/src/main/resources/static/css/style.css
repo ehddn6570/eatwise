@@ -1,0 +1,329 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* EatWise 테마: 부드러운 크림 → 식물성 연녹 그라디언트 */
+    background: linear-gradient(135deg, #f7fbf1 0%, #d4f2c2 40%, #b7f7a5 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+}
+
+.login-box, .signup-box, .home-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    /* 카드 그림자 색을 초록톤으로 부드럽게 조정 */
+    box-shadow: 0 20px 60px rgba(46, 125, 50, 0.08);
+}
+
+h1 {
+    /* 타이틀은 진한 초록으로 변경 */
+    color: #2E7D32;
+    font-size: 2.5em;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.login-form, .signup-form {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    /* 포커스 경계선과 그림자도 테마 초록으로 변경 */
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.08);
+}
+
+select {
+    cursor: pointer;
+    background-color: white;
+}
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.btn-primary {
+    /* 주 버튼: 식물성 녹색 그라디언트 */
+    background: linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(46, 125, 50, 0.18);
+}
+
+.btn-secondary {
+    background: white;
+    color: #2E7D32;
+    border: 2px solid #2E7D32;
+}
+
+.btn-secondary:hover {
+    background: #2E7D32;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.divider {
+    text-align: center;
+    margin: 25px 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.divider span {
+    background: white;
+    padding: 0 15px;
+    color: #999;
+    position: relative;
+    z-index: 1;
+}
+
+.error-message {
+    background: #fee;
+    color: #c33;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    border: 1px solid #fcc;
+}
+
+.success-message {
+    background: #efe;
+    color: #3c3;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    text-align: center;
+    border: 1px solid #cfc;
+}
+
+.description {
+    text-align: center;
+    color: #888;
+    margin-bottom: 40px;
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 이메일 자동완성 스타일 */
+.email-autocomplete-wrapper {
+    position: relative;
+}
+
+.email-suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    margin-top: 0;
+    padding: 0;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.email-suggestions-list li {
+    padding: 12px 16px;
+    cursor: pointer;
+    color: #333;
+    font-size: 0.95em;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.email-suggestions-list li:last-child {
+    border-bottom: none;
+}
+
+.email-suggestions-list li:hover {
+    background-color: #f5f5f5;
+    color: #2E7D32;
+}
+
+.email-suggestions-list li:active {
+    background-color: #e8f5e9;
+}
+
+/* 비밀번호 요구사항 스타일 */
+.password-requirements {
+    margin-top: 10px;
+    padding: 12px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    border-left: 4px solid #d4af37;
+}
+
+.requirement {
+    margin: 6px 0;
+    font-size: 0.9em;
+    color: #d32f2f;
+    transition: all 0.2s ease;
+}
+
+.requirement.met {
+    color: #4caf50;
+}
+
+/* 이메일 중복 확인 스타일 */
+.email-check-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.email-autocomplete-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.btn-email-check {
+    padding: 12px 16px;
+    background-color: #2E7D32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-email-check:hover {
+    background-color: #1b5e20;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+}
+
+.btn-email-check:active {
+    transform: scale(0.98);
+}
+
+.email-check-status {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.email-check-status.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #4caf50;
+}
+
+.email-check-status.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #d32f2f;
+}
+
+/* 로그인 페이지 전용 배경 색상 */
+.login-page {
+    /* home.html과 동일한 그라디언트 배경 */
+    background: linear-gradient(135deg, #f7fbf1 0%, #d4f2c2 40%, #b7f7a5 100%);
+}
+
+.login-page .login-box, .login-page .signup-box, .login-page .home-box {
+    background: rgba(255,255,255,0.9); /* 카드 배경을 약간 투명한 흰색으로 유지 */
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+    .login-box, .signup-box, .home-box {
+        padding: 30px 20px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
