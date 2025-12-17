@@ -47,6 +47,10 @@ logs/
 # IDE
 node_modules/
 
+# ⭐ release 폴더는 반드시 포함!
+!release/
+!release/**
+
 
 
 
