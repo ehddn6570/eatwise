@@ -7,12 +7,18 @@
 *.swp
 *.swo
 
-# Build
-build/
+# Build (build/ 전체가 아닌 특정 파일만 무시)
 .gradle/
 out/
 target/
 *.class
+build/tmp/
+build/generated/
+build/classes/
+build/resources/
+
+# ⭐ 배포에 필요한 파일 - 반드시 포함!
+# gradlew와 build/libs는 무시하지 않음
 
 # OS
 .DS_Store
@@ -40,5 +46,7 @@ logs/
 
 # IDE
 node_modules/
+
+
 
 
