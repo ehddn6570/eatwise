@@ -10,5 +10,6 @@
         <option value="get_errors" />
       </set>
     </option>
+    <option name="fontSize" value="14.0" />
   </component>
 </project>
