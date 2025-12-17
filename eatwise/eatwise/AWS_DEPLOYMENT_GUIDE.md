@@ -1,67 +1,72 @@
-# EatWise AWS 배포 체크리스트
+# EatWise AWS 배포 체크리스??
 
-## 📋 사전 준비 사항
+## ?�� ?�전 준�??�항
 
-### AWS 계정 설정
-- [ ] AWS 계정 생성
-- [ ] IAM 사용자 생성 (프로그래밍 액세스)
-- [ ] AWS 자격증명 설정
+### AWS 계정 ?�정
+- [ ] AWS 계정 ?�성
+- [ ] IAM ?�용???�성 (?�로그래�??�세??
+- [ ] AWS ?�격증명 ?�정
+- [ ] 기본 리전 ?�정: **ap-northeast-2 (?�울)**
 
-### 데이터베이스 준비
-- [ ] AWS RDS MySQL 인스턴스 생성
-  - 데이터베이스명: eatwise
-  - 마스터 사용자: admin
-  - 퍼블릭 액세스: YES
-  - 보안 그룹 인바운드: MySQL 3306 포트 허용
-- [ ] RDS 엔드포인트 복사
+### ?�이?�베?�스 준�?
+- [ ] AWS RDS MySQL ?�스?�스 ?�성
+  - **?�스?�스 ?�별??*: eatwise-instance
+  - **?�이?�베?�스�?*: eatwise
+  - **마스???�용??*: admin
+  - **마스??비�?번호**: [보안?�인 비�?번호 ?�정]
+  - **?�스?�스 ?�래??*: db.t2.micro (?�리 ?�어)
+  - **?�블�??�세??*: YES
+  - **보안 그룹**: eatwise-rds-sg (?�로 ?�성)
+- [ ] RDS ?�드?�인???�인 �?복사
+- [ ] RDS 보안 그룹 ?�바?�드 규칙: MySQL/Aurora 3306 (EC2 SG 출처)
 
-### EC2 인스턴스 설정
-- [ ] EC2 인스턴스 생성 (Ubuntu 22.04 LTS, t2.micro)
-- [ ] 키페어 다운로드
-- [ ] 보안 그룹 설정:
-  - SSH (22): 내 IP
+### EC2 ?�스?�스 ?�정
+- [ ] EC2 ?�스?�스 ?�성 (Ubuntu 22.04 LTS, t2.micro)
+- [ ] ?�페???�운로드 �?권한 ?�정 (chmod 400)
+- [ ] 보안 그룹 ?�정:
+  - SSH (22): ??IP ?�는 0.0.0.0/0
   - HTTP (80): 0.0.0.0/0
   - HTTPS (443): 0.0.0.0/0
-  - Custom (8080): 0.0.0.0/0
+  - Custom TCP (8080): 0.0.0.0/0
 
 ---
 
-## 🚀 배포 단계
+## ?? 배포 ?�계
 
-### 1단계: 로컬에서 빌드
+### 1?�계: 로컬?�서 빌드
 ```bash
 cd eatwise
 ./gradlew clean build -x test
 ```
 
-### 2단계: EC2 인스턴스 접속
+### 2?�계: EC2 ?�스?�스 ?�속
 ```bash
 ssh -i your-key.pem ubuntu@your-ec2-public-ip
 ```
 
-### 3단계: EC2에 필요한 소프트웨어 설치
+### 3?�계: EC2???�요???�프?�웨???�치
 ```bash
-# 기본 업데이트
+# 기본 ?�데?�트
 sudo apt update
 sudo apt upgrade -y
 
-# Java 17 설치
+# Java 17 ?�치
 sudo apt install -y openjdk-17-jdk
 
-# Git 설치
+# Git ?�치
 sudo apt install -y git
 
-# MySQL 클라이언트 설치
+# MySQL ?�라?�언???�치
 sudo apt install -y mysql-client
 ```
 
-### 4단계: 환경변수 설정
+### 4?�계: ?�경변???�정
 ```bash
-# 환경변수 파일 생성
+# ?�경변???�일 ?�성
 nano ~/.bashrc
 ```
 
-파일 끝에 다음 추가:
+?�일 ?�에 ?�음 추�?:
 ```bash
 export DB_HOST=your-rds-endpoint.region.rds.amazonaws.com
 export DB_USERNAME=admin
@@ -70,55 +75,55 @@ export AI_PROVIDER=bedrock
 export AWS_REGION=ap-northeast-2
 ```
 
-변경사항 적용:
+변경사???�용:
 ```bash
 source ~/.bashrc
 ```
 
-### 5단계: 프로젝트 클론 및 배포
+### 5?�계: ?�로?�트 ?�론 �?배포
 ```bash
-# 프로젝트 클론
+# ?�로?�트 ?�론
 git clone https://github.com/your-username/eatwise.git
 cd eatwise/eatwise
 
 # 빌드
 ./gradlew clean build -x test
 
-# 실행
+# ?�행
 java -jar build/libs/eatwise-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
-### 6단계: 백그라운드에서 실행 (nohup 사용)
+### 6?�계: 백그?�운?�에???�행 (nohup ?�용)
 ```bash
-# 로그 디렉토리 생성
+# 로그 ?�렉?�리 ?�성
 mkdir -p ~/logs
 
-# 백그라운드에서 실행
+# 백그?�운?�에???�행
 nohup java -jar build/libs/eatwise-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod > ~/logs/eatwise.log 2>&1 &
 
-# 프로세스 확인
+# ?�로?�스 ?�인
 ps aux | grep java
 ```
 
-### 7단계: 접속 테스트
-브라우저에서 접속:
+### 7?�계: ?�속 ?�스??
+브라?��??�서 ?�속:
 ```
 http://your-ec2-public-ip:8080
 ```
 
 ---
 
-## 🔧 옵션: Nginx 리버스 프록시 설정 (포트 숨기기)
+## ?�� ?�션: Nginx 리버???�록???�정 (?�트 ?�기�?
 
 ```bash
-# Nginx 설치
+# Nginx ?�치
 sudo apt install -y nginx
 
-# Nginx 설정
+# Nginx ?�정
 sudo nano /etc/nginx/sites-available/default
 ```
 
-다음 내용으로 수정:
+?�음 ?�용?�로 ?�정:
 ```nginx
 server {
     listen 80 default_server;
@@ -136,67 +141,67 @@ server {
 }
 ```
 
-설정 적용:
+?�정 ?�용:
 ```bash
 sudo systemctl restart nginx
 sudo systemctl enable nginx
 ```
 
-그 후 포트 없이 접속 가능:
+�????�트 ?�이 ?�속 가??
 ```
 http://your-ec2-public-ip
 ```
 
 ---
 
-## 📊 예상 비용 (월별)
+## ?�� ?�상 비용 (?�별)
 
-| 서비스 | 사양 | 가격 |
+| ?�비??| ?�양 | 가�?|
 |--------|------|------|
 | **EC2** | t2.micro | 무료 (12개월) |
 | **RDS** | db.t2.micro | 무료 (12개월) |
-| **데이터 전송** | 1GB/월 | 무료 |
-| **총계** | - | **무료 (첫 12개월)** |
+| **?�이???�송** | 1GB/??| 무료 |
+| **총계** | - | **무료 (�?12개월)** |
 
 ---
 
-## ⚠️ 보안 주의사항
+## ?�️ 보안 주의?�항
 
-- [ ] DB 비밀번호를 `환경변수`로 관리 (코드에 절대 하드코딩 금지)
-- [ ] EC2 보안 그룹에서 필요한 포트만 열기
-- [ ] RDS 퍼블릭 액세스 vs 프라이빗 액세스 선택
-- [ ] SSL/TLS 인증서 설정 (AWS Certificate Manager)
+- [ ] DB 비�?번호�?`?�경변??�?관�?(코드???��? ?�드코딩 금�?)
+- [ ] EC2 보안 그룹?�서 ?�요???�트�??�기
+- [ ] RDS ?�블�??�세??vs ?�라?�빗 ?�세???�택
+- [ ] SSL/TLS ?�증???�정 (AWS Certificate Manager)
 
 ---
 
-## 🆘 트러블슈팅
+## ?�� ?�러블슈??
 
-### 데이터베이스 연결 실패
+### ?�이?�베?�스 ?�결 ?�패
 ```bash
-# RDS 연결 테스트
+# RDS ?�결 ?�스??
 mysql -h your-rds-endpoint -u admin -p
 ```
 
-### 애플리케이션이 시작되지 않음
+### ?�플리�??�션???�작?��? ?�음
 ```bash
-# 로그 확인
+# 로그 ?�인
 cat ~/logs/eatwise.log
-tail -f ~/logs/eatwise.log  # 실시간 보기
+tail -f ~/logs/eatwise.log  # ?�시�?보기
 ```
 
-### 포트 이미 사용 중
+### ?�트 ?��? ?�용 �?
 ```bash
-# 포트 확인
+# ?�트 ?�인
 sudo lsof -i :8080
-# 프로세스 종료
+# ?�로?�스 종료
 sudo kill -9 <PID>
 ```
 
 ---
 
-## 📚 참고 링크
+## ?�� 참고 링크
 
-- [AWS RDS MySQL 생성](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.MySQL.html)
-- [AWS EC2 시작하기](https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/EC2_GetStarted.html)
-- [Spring Boot 배포 가이드](https://spring.io/guides/gs/spring-boot/)
+- [AWS RDS MySQL ?�성](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.MySQL.html)
+- [AWS EC2 ?�작?�기](https://docs.aws.amazon.com/ko_kr/AWSEC2/latest/UserGuide/EC2_GetStarted.html)
+- [Spring Boot 배포 가?�드](https://spring.io/guides/gs/spring-boot/)
 
