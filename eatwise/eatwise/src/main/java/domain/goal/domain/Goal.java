@@ -26,6 +26,10 @@ public class Goal {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "goal_type")
+    @Enumerated(EnumType.STRING)
+    private GoalType goalType;  // GAIN(증량), MAINTAIN(유지), LOSE(감량)
+
     @Column(name = "daily_calorie_target")
     private Double dailyCalorieTarget;
 
@@ -43,4 +47,20 @@ public class Goal {
 
     @Column(name = "end_date")
     private LocalDate endDate;
+
+    public enum GoalType {
+        GAIN("체중 증량"),
+        MAINTAIN("체중 유지"),
+        LOSE("체중 감량");
+
+        private final String label;
+
+        GoalType(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    }
 }

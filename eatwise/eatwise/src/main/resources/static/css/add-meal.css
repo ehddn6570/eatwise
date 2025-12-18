@@ -1,0 +1,551 @@
+/* 식사 기록 추가 페이지 스타일 */
+
+/* 방법 선택 컨테이너 */
+.method-options-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto 2rem;
+}
+
+/* 방법 선택 카드 */
+.method-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.method-card {
+    background: #f7fbf1;
+    border: 2px solid #d4f2c2;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.method-card:hover:not(.disabled) {
+    border-color: #2E7D32;
+    box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15);
+    transform: translateY(-5px);
+}
+
+.method-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.method-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    pointer-events: none;
+}
+
+.method-card h3 {
+    color: #2E7D32;
+    margin-bottom: 0.5rem;
+    font-size: 1.2em;
+    pointer-events: none;
+}
+
+.method-card p {
+    color: #666;
+    font-size: 0.95em;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    pointer-events: none;
+}
+
+.method-card .btn {
+    width: 100%;
+    pointer-events: none;
+}
+
+.btn-back {
+    background: transparent;
+    border: 2px solid #2E7D32;
+    color: #2E7D32;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #2E7D32;
+    color: white;
+}
+
+/* 페이지 제목 */
+.page-title {
+    background: rgba(255,255,255,0.92);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(46, 125, 50, 0.04);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-title h1 {
+    color: #2E7D32;
+    margin-bottom: 0.5rem;
+    font-size: 2em;
+}
+
+.page-title p {
+    color: #666;
+    font-size: 1.1em;
+    margin-bottom: 1rem;
+}
+
+.meal-section {
+    display: none;
+}
+
+/* 식사 기록 카드 */
+.meal-record-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(46,125,50,0.04);
+    max-width: 700px;
+    margin: 0 auto 2rem;
+}
+
+.meal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232E7D32' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1.2em 1.2em;
+    padding-right: 2.5rem;
+}
+
+/* 음식 검색 */
+.search-container {
+    position: relative;
+}
+
+#foodSearch {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+}
+
+#foodSearch:focus {
+    outline: none;
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+.food-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #d4f2c2;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+    display: none;
+}
+
+.food-list:hover {
+    opacity: 1;
+}
+
+/* 스크롤바 스타일 */
+.food-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.food-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 0 0 8px 0;
+}
+
+.food-list::-webkit-scrollbar-thumb {
+    background: #d4f2c2;
+    border-radius: 4px;
+}
+
+.food-list::-webkit-scrollbar-thumb:hover {
+    background: #2E7D32;
+}
+
+.food-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.food-item:hover {
+    background: #f7fbf1;
+    padding-left: 1.2rem;
+}
+
+.food-item.focused {
+    background: #d4f2c2;
+    padding-left: 1.2rem;
+    border-left: 3px solid #2E7D32;
+}
+
+.food-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.3rem;
+}
+
+.food-calories {
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* 선택된 음식 정보 */
+.selected-food-info {
+    background: linear-gradient(135deg, rgba(102, 187, 106, 0.06) 0%, rgba(46, 125, 50, 0.06) 100%);
+    border: 2px solid #d4f2c2;
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.selected-food-info h3 {
+    color: #2E7D32;
+    margin-bottom: 1rem;
+    font-size: 1.1em;
+}
+
+.food-info-item {
+    margin-bottom: 0.8rem;
+    color: #555;
+}
+
+.food-info-item strong {
+    color: #333;
+}
+
+.food-info-item ul {
+    margin-top: 0.5rem;
+    margin-left: 1.5rem;
+    color: #666;
+}
+
+.food-info-item li {
+    margin-bottom: 0.3rem;
+}
+
+/* 계산된 영양소 정보 */
+.calculated-nutrients {
+    background: rgba(102, 187, 106, 0.08);
+    border: 2px solid #66bb6a;
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.calculated-nutrients h3 {
+    color: #2E7D32;
+    margin-bottom: 1rem;
+    font-size: 1.1em;
+}
+
+.nutrient-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.nutrient-item {
+    background: white;
+    padding: 1.2rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #d4f2c2;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.nutrient-item span {
+    display: block;
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 0.8rem;
+    word-wrap: break-word;
+}
+
+.nutrient-item strong {
+    display: block;
+    color: #2E7D32;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+/* 이미지 업로드 */
+.image-upload-area {
+    border: 2px dashed #d4f2c2;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    background: #f7fbf1;
+    transition: all 0.3s ease;
+}
+
+.image-upload-area:hover {
+    border-color: #2E7D32;
+    background: #f0fae8;
+}
+
+.upload-placeholder {
+    cursor: pointer;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.image-upload-area p {
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-size: 0.95em;
+}
+
+.upload-hint {
+    color: #999;
+    font-size: 0.85em !important;
+}
+
+#imagePreview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* OCR 결과 */
+.ocr-result {
+    background: linear-gradient(135deg, rgba(102, 187, 106, 0.06) 0%, rgba(46, 125, 50, 0.06) 100%);
+    border: 2px solid #d4f2c2;
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.ocr-result h3 {
+    color: #2E7D32;
+    margin-bottom: 1rem;
+}
+
+#recognizedFoodsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.ocr-food-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #d4f2c2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #555;
+}
+
+.ocr-food-quantity {
+    color: #2E7D32;
+    font-weight: 600;
+}
+
+/* 버튼 */
+.form-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46,125,50,0.2);
+}
+
+.btn-secondary {
+    background: white;
+    color: #2E7D32;
+    border: 2px solid #2E7D32;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #2E7D32;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* 메시지 */
+.success-message {
+    background: #efe;
+    color: #3c3;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #cfc;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.error-message {
+    background: #fee;
+    color: #c33;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #fcc;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .meal-record-card {
+        padding: 1rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .method-options {
+        grid-template-columns: 1fr;
+    }
+
+    .nutrient-info {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .form-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title {
+        padding: 1.5rem;
+    }
+
+    .page-title h1 {
+        font-size: 1.5em;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5em;
+    }
+
+    #recognizedFoodsList {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .method-options {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title h1 {
+        font-size: 1.3em;
+    }
+
+    .page-title p {
+        font-size: 0.9em;
+    }
+}
+

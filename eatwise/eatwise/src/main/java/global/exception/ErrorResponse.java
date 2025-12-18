@@ -1,5 +1,6 @@
 package global.exception;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,10 @@ public class ErrorResponse {
     private String code;
     private String message;
     private int status;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
+
     private List<FieldError> errors;
 
     public ErrorResponse(ErrorCode errorCode) {

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatWise - 정보 수정</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: rgba(255,255,255,0.96);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(46, 125, 50, 0.08);
+        }
+
+        .form-container h2 {
+            color: #2E7D32;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #d4f2c2;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2E7D32;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-update {
+            flex: 1;
+            background: linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #f0f0f0;
+            color: #666;
+            border: 2px solid #d4f2c2;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+            border-color: #2E7D32;
+        }
+
+        .info-text {
+            background: #f7fbf1;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            color: #666;
+            border-left: 4px solid #2E7D32;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message {
+            background: #f1f8e9;
+            color: #33691e;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">EatWise</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-item">대시보드</a>
+                <a href="/restaurant-map" class="nav-item">음식점 지도</a>
+                <a href="/report" class="nav-item">레포트</a>
+                <a href="/edit-profile" class="nav-item active">정보 수정</a>
+                <button class="btn-notification" onclick="openNotifications()">
+                    🔔 알림
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>개인 정보 수정</h2>
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <div class="info-text">
+                ℹ️ 비밀번호, 나이, 키, 몸무게를 수정할 수 있습니다.
+            </div>
+
+            <form id="updateForm" onsubmit="handleUpdateUser(event)">
+                <div class="form-group">
+                    <label for="password">새 비밀번호 (선택사항)</label>
+                    <input type="password" id="password" name="password" placeholder="변경하지 않으려면 비워두세요">
+                </div>
+
+                <div class="form-group">
+                    <label for="age">나이</label>
+                    <input type="number" id="age" name="age" min="1" max="120" placeholder="나이 입력" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="height">키 (cm)</label>
+                        <input type="number" id="height" name="height" min="100" max="250" step="0.1" placeholder="키 입력" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weight">몸무게 (kg)</label>
+                        <input type="number" id="weight" name="weight" min="30" max="300" step="0.1" placeholder="몸무게 입력" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-update">저장</button>
+                    <button type="button" class="btn-cancel" onclick="goBack()">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let userInfo = null;
+
+        window.onload = function() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                userInfo = JSON.parse(userStr);
+                loadUserInfo(userInfo.userId || userInfo.id);
+            } catch (e) {
+                console.error('사용자 정보 파싱 실패:', e);
+                window.location.href = '/';
+            }
+        };
+
+        // 사용자 정보 로드
+        async function loadUserInfo(userId) {
+            try {
+                const response = await fetch(`/api/users/${userId}`);
+
+                if (response.ok) {
+                    const user = await response.json();
+                    console.log('✅ 사용자 정보 로드:', user);
+
+                    // 폼에 정보 채우기
+                    document.getElementById('age').value = user.age || '';
+                    document.getElementById('height').value = user.height || '';
+                    document.getElementById('weight').value = user.weight || '';
+                } else {
+                    console.error('❌ 사용자 정보 조회 실패:', response.status);
+                    showError('사용자 정보를 불러올 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('❌ 사용자 정보 로드 실패:', error);
+                showError('사용자 정보 로드 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 정보 수정
+        async function handleUpdateUser(event) {
+            event.preventDefault();
+
+            const password = document.getElementById('password').value.trim();
+            const age = parseInt(document.getElementById('age').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            // 유효성 검사
+            if (!age || age < 1 || age > 120) {
+                showError('나이를 올바르게 입력해주세요.');
+                return;
+            }
+            if (!height || height < 100 || height > 250) {
+                showError('키를 올바르게 입력해주세요. (100~250cm)');
+                return;
+            }
+            if (!weight || weight < 30 || weight > 300) {
+                showError('몸무게를 올바르게 입력해주세요. (30~300kg)');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/${userInfo.userId || userInfo.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        password: password || null,
+                        age: age,
+                        height: height,
+                        weight: weight
+                    })
+                });
+
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    console.log('✅ 사용자 정보 수정 완료:', updatedUser);
+
+                    // localStorage 업데이트
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+
+                    showSuccess('정보가 성공적으로 수정되었습니다! 🎉');
+
+                    // 3초 후 대시보드로 이동
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    const error = await response.text();
+                    console.error('❌ 정보 수정 실패:', response.status, error);
+                    showError('정보 수정에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('❌ 정보 수정 중 오류:', error);
+                showError('정보 수정 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 에러 메시지 표시
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = '⚠️ ' + message;
+            errorDiv.style.display = 'block';
+
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 성공 메시지 표시
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = '✅ ' + message;
+            successDiv.style.display = 'block';
+        }
+
+        // 뒤로 가기
+        function goBack() {
+            window.location.href = '/dashboard';
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+
+        // 알림 모달 열기
+        function openNotifications() {
+            // 알림 모달이 없으면 임시로 alert 표시
+            alert('알림 기능은 준비 중입니다.');
+        }
+
+        // 알림 개수 업데이트 (테스트용)
+        function updateNotificationBadge() {
+            const unreadCount = 0;
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                badge.textContent = unreadCount;
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', function() {
+            updateNotificationBadge();
+        });
+    </script>
+</body>
+</html>
+

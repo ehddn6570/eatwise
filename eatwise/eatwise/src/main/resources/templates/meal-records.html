@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatWise - 식사 기록</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .meal-records-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .meal-record-item {
+            background: rgba(255,255,255,0.96);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.05);
+            border-left: 4px solid #2E7D32;
+        }
+
+        .meal-record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .meal-date-time {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .meal-date {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .meal-time {
+            font-size: 0.9rem;
+            color: #666;
+            background: #f7fbf1;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .meal-type {
+            display: inline-block;
+            font-size: 1.2rem;
+        }
+
+        .meal-foods {
+            margin-top: 0.5rem;
+        }
+
+        .food-item-record {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .food-name {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .food-calories {
+            color: #2E7D32;
+            font-weight: 600;
+        }
+
+        .empty-records {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #999;
+        }
+
+        .empty-records p {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #66bb6a 0%, #2e7d32 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-logo">EatWise</h1>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-item">대시보드</a>
+                <a href="/restaurant-map" class="nav-item">음식점 지도</a>
+                <a href="/report" class="nav-item active">레포트</a>
+                <a href="/edit-profile" class="nav-item">정보 수정</a>
+                <button class="btn-notification" onclick="openNotifications()">
+                    🔔 알림
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="meal-records-container">
+        <button class="btn-back" onclick="goBack()">← 뒤로가기</button>
+
+        <h2 style="color: #2E7D32; margin-bottom: 1.5rem;">최근 식사 기록</h2>
+
+        <div id="mealRecordsContent">
+            <div class="empty-records">
+                <p>📝 로딩 중...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userInfo = null;
+
+        window.onload = function() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                userInfo = JSON.parse(userStr);
+                loadMealRecords(userInfo.userId || userInfo.id);
+            } catch (e) {
+                console.error('사용자 정보 파싱 실패:', e);
+                window.location.href = '/';
+            }
+        };
+
+        // 최근 7개 식사 기록 조회
+        async function loadMealRecords(userId) {
+            try {
+                // 로컬 시간 기준으로 계산
+                const today = new Date();
+                const endDate = today.getFullYear() + '-' +
+                               String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                               String(today.getDate()).padStart(2, '0');
+
+                const thirtyDaysAgo = new Date(today);
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                const startDate = thirtyDaysAgo.getFullYear() + '-' +
+                                 String(thirtyDaysAgo.getMonth() + 1).padStart(2, '0') + '-' +
+                                 String(thirtyDaysAgo.getDate()).padStart(2, '0');
+
+                console.log('🔍 조회 범위:', startDate, '~', endDate);
+
+                const response = await fetch(`/api/meal-records/user/${userId}/date-range?startDate=${startDate}&endDate=${endDate}`);
+
+                if (response.ok) {
+                    const allRecords = await response.json();
+
+                    // 최신순으로 정렬
+                    const sortedRecords = allRecords.sort((a, b) => {
+                        const dateTimeA = new Date(`${a.intakeDate}T${a.intakeTime}`);
+                        const dateTimeB = new Date(`${b.intakeDate}T${b.intakeTime}`);
+                        return dateTimeB - dateTimeA;
+                    });
+
+                    // 최근 7개만 선택
+                    const recentRecords = sortedRecords.slice(0, 7);
+                    console.log('📝 조회된 식사 기록:', recentRecords);
+                    displayMealRecords(recentRecords);
+                } else {
+                    console.error('❌ 식사 기록 조회 실패:', response.status);
+                    showError('식사 기록을 불러올 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('❌ 식사 기록 조회 중 오류:', error);
+                showError('식사 기록 조회 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 식사 기록 표시
+        function displayMealRecords(records) {
+            const content = document.getElementById('mealRecordsContent');
+
+            if (records.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-records">
+                        <p>📝 아직 기록된 식사가 없습니다.</p>
+                        <p>첫 식사를 기록해보세요!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const mealTypeEmoji = {
+                'BREAKFAST': '🌅',
+                'LUNCH': '☀️',
+                'DINNER': '🌙',
+                'SNACK': '🍪'
+            };
+
+            // 식사를 날짜 + 시간 + 식사유형으로 그룹화
+            const groupedMeals = {};
+            records.forEach(record => {
+                const key = `${record.intakeDate}_${record.intakeTime}_${record.mealType}`;
+                if (!groupedMeals[key]) {
+                    groupedMeals[key] = {
+                        intakeDate: record.intakeDate,
+                        intakeTime: record.intakeTime,
+                        mealType: record.mealType,
+                        totalCalories: 0,
+                        foods: []
+                    };
+                }
+
+                // 음식 추가
+                if (record.foods && record.foods.length > 0) {
+                    groupedMeals[key].foods.push(...record.foods);
+                } else if (record.foodName) {
+                    groupedMeals[key].foods.push({
+                        foodId: record.foodId,
+                        foodName: record.foodName,
+                        calories: record.totalCalories,
+                        quantity: record.quantity
+                    });
+                }
+
+                // 총 칼로리 합산
+                groupedMeals[key].totalCalories += (record.totalCalories || 0);
+            });
+
+            // 그룹화된 식사들을 최신순으로 정렬
+            const groupedArray = Object.values(groupedMeals).sort((a, b) => {
+                const dateTimeA = new Date(`${a.intakeDate}T${a.intakeTime}`);
+                const dateTimeB = new Date(`${b.intakeDate}T${b.intakeTime}`);
+                return dateTimeB - dateTimeA;
+            });
+
+            content.innerHTML = groupedArray.map(meal => {
+                const mealTypeUpper = meal.mealType ? meal.mealType.toUpperCase() : 'LUNCH';
+                const emoji = mealTypeEmoji[mealTypeUpper] || '🍽️';
+                return `
+                <div class="meal-record-item">
+                    <div class="meal-record-header">
+                        <div class="meal-date-time">
+                            <div class="meal-date">${emoji} ${formatDate(meal.intakeDate)}</div>
+                            <div class="meal-time">
+                                ${getMealTypeLabel(meal.mealType)} ${formatTime(meal.intakeTime)}
+                            </div>
+                        </div>
+                        <div style="color: #2E7D32; font-weight: 600; font-size: 1.1rem;">
+                            ${Math.round(meal.totalCalories)} kcal
+                        </div>
+                    </div>
+                    <div class="meal-foods">
+                        ${meal.foods && meal.foods.length > 0 ?
+                            meal.foods.map(food => `
+                                <div class="food-item-record">
+                                    <span class="food-name">${food.foodName}</span>
+                                    <span class="food-calories">${food.calories ? Math.round(food.calories) : 0} kcal</span>
+                                </div>
+                            `).join('') :
+                            '<div class="food-item-record"><span class="food-name">식사 정보 없음</span></div>'
+                        }
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // 날짜 포맷
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'short'
+            });
+        }
+
+        // 시간 포맷
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            const [hours, minutes] = timeStr.split(':');
+            return `${hours}:${minutes}`;
+        }
+
+        // 식사 유형 라벨
+        function getMealTypeLabel(mealType) {
+            const labels = {
+                'BREAKFAST': '아침',
+                'LUNCH': '점심',
+                'DINNER': '저녁',
+                'SNACK': '간식'
+            };
+            return labels[mealType] || '식사';
+        }
+
+        // 에러 표시
+        function showError(message) {
+            const content = document.getElementById('mealRecordsContent');
+            content.innerHTML = `
+                <div class="empty-records">
+                    <p>❌ ${message}</p>
+                </div>
+            `;
+        }
+
+        // 뒤로가기
+        function goBack() {
+            window.location.href = '/dashboard';
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+
+        // 알림 함수 (네비게이션 호환성)
+        function openNotifications() {
+            alert('알림 기능은 준비 중입니다.');
+        }
+    </script>
+</body>
+</html>
+

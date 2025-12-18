@@ -32,6 +32,9 @@ public class MealRecord {
     @JoinColumn(name = "food_id")
     private Food food;
 
+    @Column(name = "meal_type")
+    private String mealType;
+
     @Column(name = "intake_time")
     private LocalDateTime intakeTime;
 

@@ -48,6 +48,13 @@ public class FoodController {
         return ResponseEntity.ok(responses);
     }
 
+    // OCR 텍스트에서 음식명 추출
+    @PostMapping("/extract-from-ocr")
+    public ResponseEntity<List<FoodResponse>> extractFoodsFromOCR(@RequestBody String ocrText) {
+        List<FoodResponse> results = foodService.extractFoodsFromOCRText(ocrText);
+        return ResponseEntity.ok(results);
+    }
+
     @PutMapping("/{foodId}")
     public ResponseEntity<FoodResponse> updateFood(
             @PathVariable Long foodId,

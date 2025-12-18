@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+  build:
+    commands:
+      - echo "Building Spring Boot application..."
+      - ./gradlew clean build -x test
+  post_build:
+    commands:
+      - echo "Build completed"
+
+artifacts:
+  files:
+    - build/libs/*.jar
+  name: SpringBootApp
+
+cache:
+  paths:
+    - '/root/.gradle/**/*'
+    - '/root/.m2/**/*'
+

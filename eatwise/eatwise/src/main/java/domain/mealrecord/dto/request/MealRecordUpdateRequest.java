@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class MealRecordUpdateRequest {
 
-    private LocalDateTime intakeTime;
-    private LocalDate intakeDate;
+    private String mealType;
+
+    private String intakeTime;      // "HH:mm:ss" 형식의 문자열
+    private String intakeDate;      // "yyyy-MM-dd" 형식의 문자열
+
     private Double quantity;
-    private Double totalCalories;
 }

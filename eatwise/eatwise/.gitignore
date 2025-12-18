@@ -1,37 +1,53 @@
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IDE
+.idea/
 *.iml
+*.iws
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
 .vscode/
+*.swp
+*.swo
+
+# Build
+.gradle/
+out/
+target/
+*.class
+build/
+!build/libs/
+!build/libs/*.jar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ⚠️ 절대 GitHub에 올리지 않을 파일들
+# 실제 설정 파일 (API 키 포함)
+src/main/resources/application.properties
+src/main/resources/application-dev.properties
+src/main/resources/application-prod.properties
+src/main/resources/application-local.properties
+
+# Environment files - 가장 중요!
+.env
+.env.local
+.env.*.local
+.env.*.properties
+*.pem
+*.key
+*.keystore
+
+# Logs
+*.log
+logs/
+
+# IDE
+node_modules/
+
+# ⭐ release 폴더 및 JAR 파일은 반드시 포함!
+!release/
+!release/**
+!release/*.jar
+
+
+
+
